@@ -1,11 +1,19 @@
 #include <iostream>
+#include <thread>
+#include <chrono>
 #include "transport/Transport_CAN_Linux.h"
 
 int main()
 {
-    std::cout << "Starting raw CAN listener...\n";
-
     Transport_CAN_Linux can("can0");
+
+    if (!can.isValid())
+    {
+        std::cerr << "CAN init failed\n";
+        return 1;
+    }
+
+    std::cout << "CAN listener started\n";
 
     while (true)
     {
@@ -21,6 +29,8 @@ int main()
                       << std::dec << (int)len
                       << std::endl;
         }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
     return 0;
