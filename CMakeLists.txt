@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(ecu_platform
     src/main.cpp
+    src/transport/Transport_CAN_Linux.cpp
 )
 
 target_include_directories(ecu_platform PRIVATE

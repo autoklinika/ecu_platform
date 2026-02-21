@@ -153,6 +153,30 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/transport/Transport_CAN_Linux.o: src/transport/Transport_CAN_Linux.cpp.o
+.PHONY : src/transport/Transport_CAN_Linux.o
+
+# target to build an object file
+src/transport/Transport_CAN_Linux.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/transport/Transport_CAN_Linux.cpp.o
+.PHONY : src/transport/Transport_CAN_Linux.cpp.o
+
+src/transport/Transport_CAN_Linux.i: src/transport/Transport_CAN_Linux.cpp.i
+.PHONY : src/transport/Transport_CAN_Linux.i
+
+# target to preprocess a source file
+src/transport/Transport_CAN_Linux.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/transport/Transport_CAN_Linux.cpp.i
+.PHONY : src/transport/Transport_CAN_Linux.cpp.i
+
+src/transport/Transport_CAN_Linux.s: src/transport/Transport_CAN_Linux.cpp.s
+.PHONY : src/transport/Transport_CAN_Linux.s
+
+# target to generate assembly for a file
+src/transport/Transport_CAN_Linux.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/transport/Transport_CAN_Linux.cpp.s
+.PHONY : src/transport/Transport_CAN_Linux.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -165,6 +189,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/transport/Transport_CAN_Linux.o"
+	@echo "... src/transport/Transport_CAN_Linux.i"
+	@echo "... src/transport/Transport_CAN_Linux.s"
 .PHONY : help
 
 
