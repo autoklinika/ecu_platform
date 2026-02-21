@@ -169,4 +169,5 @@ CMakeFiles/ecu_platform.dir/src/main.cpp.o: \
  /usr/include/aarch64-linux-gnu/bits/stdint-least.h \
  /usr/include/c++/14/limits /usr/include/c++/14/ctime \
  /usr/include/c++/14/bits/parse_numbers.h /usr/include/c++/14/chrono \
- /home/ecutesret/ecu_platform/src/transport/Transport_CAN_Linux.h
+ /home/ecutesret/ecu_platform/src/transport/Transport_CAN_Linux.h \
+ /home/ecutesret/ecu_platform/src/transport/ITransport_CAN.h

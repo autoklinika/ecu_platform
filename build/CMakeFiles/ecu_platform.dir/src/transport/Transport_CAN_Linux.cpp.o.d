@@ -23,6 +23,7 @@ CMakeFiles/ecu_platform.dir/src/transport/Transport_CAN_Linux.cpp.o: \
  /usr/include/aarch64-linux-gnu/bits/stdint-intn.h \
  /usr/include/aarch64-linux-gnu/bits/stdint-uintn.h \
  /usr/include/aarch64-linux-gnu/bits/stdint-least.h \
+ /home/ecutesret/ecu_platform/src/transport/ITransport_CAN.h \
  /usr/include/linux/can.h /usr/include/linux/types.h \
  /usr/lib/linux/uapi/arm64/asm/types.h /usr/include/asm-generic/types.h \
  /usr/include/asm-generic/int-ll64.h \
