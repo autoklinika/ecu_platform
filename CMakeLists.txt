@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.16)
+project(ecu_platform)
+
+set(CMAKE_CXX_STANDARD 17)
+
+add_executable(ecu_platform
+    src/main.cpp
+)
+
+target_include_directories(ecu_platform PRIVATE
+    ${CMAKE_SOURCE_DIR}/src
+)

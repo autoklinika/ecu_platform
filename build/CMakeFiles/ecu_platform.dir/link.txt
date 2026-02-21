@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/ecu_platform.dir/link.d CMakeFiles/ecu_platform.dir/src/main.cpp.o -o ecu_platform
