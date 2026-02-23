@@ -10,4 +10,5 @@ add_executable(ecu_platform
 
 target_include_directories(ecu_platform PRIVATE
     ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/transport
 )

@@ -219,6 +219,7 @@ CMakeFiles/ecu_platform.dir/src/main.cpp.o: /home/ecutesret/ecu_platform/src/mai
   /usr/lib/linux/uapi/arm64/asm/types.h
 
 CMakeFiles/ecu_platform.dir/src/transport/Transport_CAN_Linux.cpp.o: /home/ecutesret/ecu_platform/src/transport/Transport_CAN_Linux.cpp \
+  /home/ecutesret/ecu_platform/src/transport/ITransport_CAN.h \
   /home/ecutesret/ecu_platform/src/transport/Transport_CAN_Linux.h \
   /usr/include/aarch64-linux-gnu/bits/atomic_wide_counter.h \
   /usr/include/aarch64-linux-gnu/bits/byteswap.h \
