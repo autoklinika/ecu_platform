@@ -169,9 +169,7 @@ CMakeFiles/ecu_platform.dir/src/main.cpp.o: \
  /usr/include/c++/14/bits/basic_string.tcc \
  /home/ecutesret/ecu_platform/src/isotp/ISOTP.h \
  /usr/include/c++/14/chrono \
- /home/ecutesret/ecu_platform/src/uds/UDS_Client.h \
- /usr/include/c++/14/optional \
- /usr/include/c++/14/bits/enable_special_members.h \
+ /home/ecutesret/ecu_platform/src/uds/UDS_Core.h \
  /usr/include/c++/14/thread /usr/include/c++/14/bits/std_thread.h \
  /usr/include/c++/14/bits/this_thread_sleep.h \
  /usr/include/c++/14/iostream /usr/include/c++/14/ostream \

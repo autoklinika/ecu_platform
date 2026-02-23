@@ -249,6 +249,30 @@ src/uds/UDS_Client.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/uds/UDS_Client.cpp.s
 .PHONY : src/uds/UDS_Client.cpp.s
 
+src/uds/UDS_Core.o: src/uds/UDS_Core.cpp.o
+.PHONY : src/uds/UDS_Core.o
+
+# target to build an object file
+src/uds/UDS_Core.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/uds/UDS_Core.cpp.o
+.PHONY : src/uds/UDS_Core.cpp.o
+
+src/uds/UDS_Core.i: src/uds/UDS_Core.cpp.i
+.PHONY : src/uds/UDS_Core.i
+
+# target to preprocess a source file
+src/uds/UDS_Core.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/uds/UDS_Core.cpp.i
+.PHONY : src/uds/UDS_Core.cpp.i
+
+src/uds/UDS_Core.s: src/uds/UDS_Core.cpp.s
+.PHONY : src/uds/UDS_Core.s
+
+# target to generate assembly for a file
+src/uds/UDS_Core.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/uds/UDS_Core.cpp.s
+.PHONY : src/uds/UDS_Core.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -273,6 +297,9 @@ help:
 	@echo "... src/uds/UDS_Client.o"
 	@echo "... src/uds/UDS_Client.i"
 	@echo "... src/uds/UDS_Client.s"
+	@echo "... src/uds/UDS_Core.o"
+	@echo "... src/uds/UDS_Core.i"
+	@echo "... src/uds/UDS_Core.s"
 .PHONY : help
 
 

@@ -9,6 +9,7 @@ add_executable(ecu_platform
     src/core/CAN_Dispatcher.cpp
     src/isotp/ISOTP.cpp
     src/uds/UDS_Client.cpp
+    src/uds/UDS_Core.cpp
 )
 
 target_include_directories(ecu_platform PRIVATE

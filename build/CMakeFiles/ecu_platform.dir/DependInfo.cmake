@@ -13,6 +13,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/ecutesret/ecu_platform/src/main.cpp" "CMakeFiles/ecu_platform.dir/src/main.cpp.o" "gcc" "CMakeFiles/ecu_platform.dir/src/main.cpp.o.d"
   "/home/ecutesret/ecu_platform/src/transport/Transport_CAN_Linux.cpp" "CMakeFiles/ecu_platform.dir/src/transport/Transport_CAN_Linux.cpp.o" "gcc" "CMakeFiles/ecu_platform.dir/src/transport/Transport_CAN_Linux.cpp.o.d"
   "/home/ecutesret/ecu_platform/src/uds/UDS_Client.cpp" "CMakeFiles/ecu_platform.dir/src/uds/UDS_Client.cpp.o" "gcc" "CMakeFiles/ecu_platform.dir/src/uds/UDS_Client.cpp.o.d"
+  "/home/ecutesret/ecu_platform/src/uds/UDS_Core.cpp" "CMakeFiles/ecu_platform.dir/src/uds/UDS_Core.cpp.o" "gcc" "CMakeFiles/ecu_platform.dir/src/uds/UDS_Core.cpp.o.d"
   "" "ecu_platform" "gcc" "CMakeFiles/ecu_platform.dir/link.d"
   )
 

@@ -4,7 +4,7 @@
 #include "core/CAN_FrameHandler.h"
 #include "transport/Transport_CAN_Linux.h"
 #include "isotp/ISOTP.h"
-#include "uds/UDS_Client.h"
+#include "uds/UDS_Core.h"
 
 #include <thread>
 #include <iostream>
@@ -43,7 +43,8 @@ void canRxThread(ITransport_CAN& can,
 // =======================
 void protocolThread(FrameQueue &queue,
                     CAN_Dispatcher &dispatcher,
-                    ISOTP& isotp)
+                    ISOTP& isotp,
+                    UDS_Core& udsCore)
 {
     while(true)
     {
@@ -52,11 +53,14 @@ void protocolThread(FrameQueue &queue,
         if(!queue.pop(f))
             break;
 
-        // 1️⃣ Dispatcher → przekazuje do ISOTP
+        // 1️⃣ Dispatcher → ISOTP
         dispatcher.dispatch(f.id, f.data, f.len);
 
         // 2️⃣ ISO-TP tick
         isotp.update();
+
+        // 3️⃣ UDS Core tick
+        udsCore.update();
     }
 }
 
@@ -77,13 +81,11 @@ int main()
     CAN_Dispatcher dispatcher;
 
     // ===== 29-bit UDS addressing =====
-    // Tester SA = 0xF9
-    // ECU SA    = 0x30
     uint32_t testerToEcu = 0x18DA30F9;
     uint32_t ecuToTester = 0x18DAF930;
 
     ISOTP isotp(can, testerToEcu, ecuToTester);
-    UDS_Client uds(isotp);
+    UDS_Core udsCore(isotp);
 
     dispatcher.registerHandler(&isotp);
 
@@ -94,39 +96,81 @@ int main()
     std::thread protoThread(protocolThread,
                             std::ref(queue),
                             std::ref(dispatcher),
-                            std::ref(isotp));
+                            std::ref(isotp),
+                            std::ref(udsCore));
 
     std::cout << "System running...\n";
 
-    // ==========================
-    // TEST SEKWENCJA UDS
-    // ==========================
+    std::this_thread::sleep_for(seconds(1));
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-
+    // ==========================
     // 1️⃣ Extended Session
-    if(uds.startExtendedSession())
+    // ==========================
+
+    if(!udsCore.request({0x10, 0x03}))
     {
-        std::cout << "Extended session started\n";
-    }
-    else
-    {
-        std::cout << "Session start failed\n";
+        std::cout << "Session request send failed\n";
         return 1;
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
-
-    // 2️⃣ Read VIN
-    auto vin = uds.readVIN();
-
-    if(vin)
+    while(udsCore.getState() == UDS_Core::State::WaitingResponse)
     {
-        std::cout << "VIN: " << *vin << std::endl;
+        std::this_thread::sleep_for(milliseconds(5));
+    }
+
+    if(udsCore.getState() == UDS_Core::State::Done)
+    {
+        auto resp = udsCore.getResponse();
+
+        if(resp.size() >= 2 && resp[0] == 0x50)
+        {
+            std::cout << "Extended session started\n";
+            udsCore.setSessionActive(true);
+        }
+        else
+        {
+            std::cout << "Session negative response\n";
+            return 1;
+        }
     }
     else
     {
-        std::cout << "VIN read failed\n";
+        std::cout << "Session timeout/error\n";
+        return 1;
+    }
+
+    // ==========================
+    // 2️⃣ Read VIN
+    // ==========================
+
+    if(!udsCore.request({0x22, 0xF1, 0x90}))
+    {
+        std::cout << "VIN request send failed\n";
+        return 1;
+    }
+
+    while(udsCore.getState() == UDS_Core::State::WaitingResponse)
+    {
+        std::this_thread::sleep_for(milliseconds(5));
+    }
+
+    if(udsCore.getState() == UDS_Core::State::Done)
+    {
+        auto resp = udsCore.getResponse();
+
+        if(resp.size() > 3 && resp[0] == 0x62)
+        {
+            std::string vin(resp.begin() + 3, resp.end());
+            std::cout << "VIN: " << vin << "\n";
+        }
+        else
+        {
+            std::cout << "VIN invalid response\n";
+        }
+    }
+    else
+    {
+        std::cout << "VIN timeout/error\n";
     }
 
     std::cout << "Press ENTER to stop\n";
