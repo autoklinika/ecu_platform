@@ -56,7 +56,8 @@ bool Transport_CAN_Linux::sendFrame(uint32_t id,
         return false;
 
     struct can_frame frame {};
-    frame.can_id  = id;
+    
+    frame.can_id  = (id & CAN_EFF_MASK) | CAN_EFF_FLAG;  // 🔴 KLUCZOWE
     frame.can_dlc = len;
 
     std::memcpy(frame.data, data, len);
@@ -74,7 +75,11 @@ bool Transport_CAN_Linux::receiveFrame(uint32_t& id,
     if(nbytes <= 0)
         return false;
 
-    id  = frame.can_id;
+    if(frame.can_id & CAN_EFF_FLAG)
+        id = frame.can_id & CAN_EFF_MASK;   // 29-bit
+    else
+        id = frame.can_id & CAN_SFF_MASK;   // 11-bit
+
     len = frame.can_dlc;
     std::memcpy(data, frame.data, len);
 

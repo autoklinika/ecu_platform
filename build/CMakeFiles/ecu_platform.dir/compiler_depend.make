@@ -254,6 +254,7 @@ CMakeFiles/ecu_platform.dir/src/main.cpp.o: /home/ecutesret/ecu_platform/src/mai
   /home/ecutesret/ecu_platform/src/core/CAN_FrameHandler.h \
   /home/ecutesret/ecu_platform/src/core/Frame.h \
   /home/ecutesret/ecu_platform/src/core/FrameQueue.h \
+  /home/ecutesret/ecu_platform/src/isotp/ISOTP.h \
   /home/ecutesret/ecu_platform/src/transport/ITransport_CAN.h \
   /home/ecutesret/ecu_platform/src/transport/Transport_CAN_Linux.h \
   /usr/include/aarch64-linux-gnu/bits/atomic_wide_counter.h \
@@ -341,14 +342,11 @@ CMakeFiles/ecu_platform.dir/src/main.cpp.o: /home/ecutesret/ecu_platform/src/mai
   /usr/include/asm-generic/int-ll64.h \
   /usr/include/asm-generic/posix_types.h \
   /usr/include/asm-generic/types.h \
-  /usr/include/c++/14/atomic \
   /usr/include/c++/14/backward/binders.h \
   /usr/include/c++/14/bit \
   /usr/include/c++/14/bits/alloc_traits.h \
   /usr/include/c++/14/bits/allocated_ptr.h \
   /usr/include/c++/14/bits/allocator.h \
-  /usr/include/c++/14/bits/atomic_base.h \
-  /usr/include/c++/14/bits/atomic_lockfree_defines.h \
   /usr/include/c++/14/bits/basic_ios.h \
   /usr/include/c++/14/bits/basic_ios.tcc \
   /usr/include/c++/14/bits/basic_string.h \
@@ -706,11 +704,14 @@ ecu_platform: /lib/aarch64-linux-gnu/libc.so.6 \
   /usr/lib/gcc/aarch64-linux-gnu/14/libgcc_s.so \
   /usr/lib/gcc/aarch64-linux-gnu/14/libstdc++.so \
   CMakeFiles/ecu_platform.dir/src/core/CAN_Dispatcher.cpp.o \
+  CMakeFiles/ecu_platform.dir/src/isotp/ISOTP.cpp.o \
   CMakeFiles/ecu_platform.dir/src/main.cpp.o \
   CMakeFiles/ecu_platform.dir/src/transport/Transport_CAN_Linux.cpp.o
 
 
 CMakeFiles/ecu_platform.dir/src/transport/Transport_CAN_Linux.cpp.o:
+
+CMakeFiles/ecu_platform.dir/src/isotp/ISOTP.cpp.o:
 
 /usr/lib/gcc/aarch64-linux-gnu/14/libgcc.a:
 
@@ -756,13 +757,7 @@ CMakeFiles/ecu_platform.dir/src/transport/Transport_CAN_Linux.cpp.o:
 
 /usr/include/aarch64-linux-gnu/bits/types/struct_iovec.h:
 
-/usr/include/aarch64-linux-gnu/bits/sockaddr.h:
-
 /usr/include/aarch64-linux-gnu/c++/14/bits/c++locale.h:
-
-/usr/include/aarch64-linux-gnu/bits/socket_type.h:
-
-/usr/include/aarch64-linux-gnu/bits/waitstatus.h:
 
 /usr/lib/gcc/aarch64-linux-gnu/14/libgcc_s.so:
 
@@ -828,11 +823,9 @@ CMakeFiles/ecu_platform.dir/src/transport/Transport_CAN_Linux.cpp.o:
 
 /usr/include/aarch64-linux-gnu/bits/timesize.h:
 
-/usr/include/aarch64-linux-gnu/bits/socket.h:
-
-/usr/include/c++/14/bits/atomic_base.h:
-
 /usr/include/aarch64-linux-gnu/bits/endian.h:
+
+/usr/include/aarch64-linux-gnu/bits/socket.h:
 
 /usr/lib/gcc/aarch64-linux-gnu/14/include/stddef.h:
 
@@ -883,6 +876,10 @@ CMakeFiles/ecu_platform.dir/src/transport/Transport_CAN_Linux.cpp.o:
 /usr/include/c++/14/bits/stl_iterator_base_funcs.h:
 
 /usr/include/c++/14/ext/alloc_traits.h:
+
+/usr/include/aarch64-linux-gnu/bits/waitstatus.h:
+
+/usr/include/aarch64-linux-gnu/bits/socket_type.h:
 
 /usr/include/aarch64-linux-gnu/bits/types/timer_t.h:
 
@@ -1238,6 +1235,10 @@ CMakeFiles/ecu_platform.dir/src/core/CAN_Dispatcher.cpp.o:
 
 /usr/include/aarch64-linux-gnu/c++/14/bits/atomic_word.h:
 
+/usr/include/c++/14/chrono:
+
+/usr/include/c++/14/exception:
+
 /usr/include/ctype.h:
 
 /usr/include/aarch64-linux-gnu/c++/14/bits/error_constants.h:
@@ -1252,19 +1253,7 @@ CMakeFiles/ecu_platform.dir/src/main.cpp.o:
 
 /usr/include/asm-generic/bitsperlong.h:
 
-/usr/include/c++/14/chrono:
-
-/usr/include/c++/14/exception:
-
-/usr/include/c++/14/atomic:
-
 /usr/include/c++/14/bits/allocated_ptr.h:
-
-/usr/include/c++/14/bits/atomic_lockfree_defines.h:
-
-/usr/include/c++/14/bits/std_abs.h:
-
-/usr/include/linux/sched/types.h:
 
 /usr/include/c++/14/bits/basic_ios.h:
 
@@ -1302,6 +1291,10 @@ CMakeFiles/ecu_platform.dir/src/main.cpp.o:
 
 /usr/include/c++/14/thread:
 
+/usr/include/c++/14/bits/std_abs.h:
+
+/usr/include/linux/sched/types.h:
+
 /usr/lib/gcc/aarch64-linux-gnu/14/crtbeginS.o:
 
 /usr/include/linux/types.h:
@@ -1309,3 +1302,5 @@ CMakeFiles/ecu_platform.dir/src/main.cpp.o:
 /usr/include/aarch64-linux-gnu/c++/14/bits/ctype_inline.h:
 
 /usr/include/aarch64-linux-gnu/bits/confname.h:
+
+/usr/include/aarch64-linux-gnu/bits/sockaddr.h:
