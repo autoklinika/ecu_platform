@@ -1,8 +1,8 @@
 #include "FrameQueue.h"
 #include "Transport_CAN_Linux.h"
-#include "core/Frame.h"
-#include "core/CAN_Dispatcher.h"
-#include "core/CAN_FrameHandler.h"
+#include "Frame.h"
+#include "CAN_Dispatcher.h"
+#include "CAN_FrameHandler.h"
 
 #include <thread>
 #include <iostream>

@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/ecutesret/ecu_platform/src -I/home/ecutesret/ecu_platform/src/transport -I/home/ecutesret/ecu_platform/src/core
+CXX_INCLUDES = -I/home/ecutesret/ecu_platform/src -I/home/ecutesret/ecu_platform/src/transport -I/home/ecutesret/ecu_platform/src/core -I/home/ecutesret/ecu_platform/src/isotp
 
 CXX_FLAGS = -std=gnu++17
 

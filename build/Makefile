@@ -153,6 +153,30 @@ src/core/CAN_Dispatcher.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/core/CAN_Dispatcher.cpp.s
 .PHONY : src/core/CAN_Dispatcher.cpp.s
 
+src/isotp/ISOTP.o: src/isotp/ISOTP.cpp.o
+.PHONY : src/isotp/ISOTP.o
+
+# target to build an object file
+src/isotp/ISOTP.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/isotp/ISOTP.cpp.o
+.PHONY : src/isotp/ISOTP.cpp.o
+
+src/isotp/ISOTP.i: src/isotp/ISOTP.cpp.i
+.PHONY : src/isotp/ISOTP.i
+
+# target to preprocess a source file
+src/isotp/ISOTP.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/isotp/ISOTP.cpp.i
+.PHONY : src/isotp/ISOTP.cpp.i
+
+src/isotp/ISOTP.s: src/isotp/ISOTP.cpp.s
+.PHONY : src/isotp/ISOTP.s
+
+# target to generate assembly for a file
+src/isotp/ISOTP.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/isotp/ISOTP.cpp.s
+.PHONY : src/isotp/ISOTP.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -213,6 +237,9 @@ help:
 	@echo "... src/core/CAN_Dispatcher.o"
 	@echo "... src/core/CAN_Dispatcher.i"
 	@echo "... src/core/CAN_Dispatcher.s"
+	@echo "... src/isotp/ISOTP.o"
+	@echo "... src/isotp/ISOTP.i"
+	@echo "... src/isotp/ISOTP.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
