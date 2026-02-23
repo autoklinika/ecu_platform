@@ -129,6 +129,30 @@ ecu_platform/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/build
 .PHONY : ecu_platform/fast
 
+src/core/CAN_Dispatcher.o: src/core/CAN_Dispatcher.cpp.o
+.PHONY : src/core/CAN_Dispatcher.o
+
+# target to build an object file
+src/core/CAN_Dispatcher.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/core/CAN_Dispatcher.cpp.o
+.PHONY : src/core/CAN_Dispatcher.cpp.o
+
+src/core/CAN_Dispatcher.i: src/core/CAN_Dispatcher.cpp.i
+.PHONY : src/core/CAN_Dispatcher.i
+
+# target to preprocess a source file
+src/core/CAN_Dispatcher.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/core/CAN_Dispatcher.cpp.i
+.PHONY : src/core/CAN_Dispatcher.cpp.i
+
+src/core/CAN_Dispatcher.s: src/core/CAN_Dispatcher.cpp.s
+.PHONY : src/core/CAN_Dispatcher.s
+
+# target to generate assembly for a file
+src/core/CAN_Dispatcher.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/core/CAN_Dispatcher.cpp.s
+.PHONY : src/core/CAN_Dispatcher.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -186,6 +210,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... ecu_platform"
+	@echo "... src/core/CAN_Dispatcher.o"
+	@echo "... src/core/CAN_Dispatcher.i"
+	@echo "... src/core/CAN_Dispatcher.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

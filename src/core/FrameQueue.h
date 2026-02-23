@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Frame.h"
 #include <queue>
 #include <mutex>
 #include <condition_variable>
-#include <chrono>
+
+#include "Frame.h"
 
 class FrameQueue
 {
@@ -18,21 +18,16 @@ public:
         cv_.notify_one();
     }
 
-    // Blokujące oczekiwanie z timeoutem
-    bool waitAndPop(Frame& out,
-                    std::chrono::milliseconds timeout)
+    bool pop(Frame& out)
     {
         std::unique_lock<std::mutex> lock(mutex_);
 
-        cv_.wait_for(lock, timeout, [&]{
+        cv_.wait(lock, [&]{
             return !queue_.empty() || !running_;
         });
 
-        if(!running_)
-            return false;
-
         if(queue_.empty())
-            return true;   // timeout (tick)
+            return false;
 
         out = queue_.front();
         queue_.pop();
@@ -46,11 +41,6 @@ public:
             running_ = false;
         }
         cv_.notify_all();
-    }
-
-    bool isRunning() const
-    {
-        return running_;
     }
 
 private:

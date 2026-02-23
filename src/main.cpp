@@ -1,5 +1,8 @@
 #include "FrameQueue.h"
 #include "Transport_CAN_Linux.h"
+#include "core/Frame.h"
+#include "core/CAN_Dispatcher.h"
+#include "core/CAN_FrameHandler.h"
 
 #include <thread>
 #include <iostream>
@@ -9,10 +12,23 @@
 
 using namespace std::chrono;
 
+class DebugHandler : public CAN_FrameHandler
+{
+public:
+    void handleFrame(uint32_t id,
+                     const uint8_t* data,
+                     uint8_t len) override
+    {
+        std::cout << "DISPATCH 0x"
+                  << std::hex << id
+                  << std::dec << std::endl;
+    }
+};
+
 void canRxThread(ITransport_CAN& can,
                  FrameQueue& queue)
 {
-    while(queue.isRunning())
+    while(true)
     {
         uint32_t id;
         uint8_t data[8];
@@ -20,8 +36,8 @@ void canRxThread(ITransport_CAN& can,
 
         if(can.receiveFrame(id, data, len))
         {
-            Frame f {};
-            f.id  = id;
+            Frame f{};
+            f.id = id;
             f.len = len;
             std::memcpy(f.data, data, len);
 
@@ -30,40 +46,26 @@ void canRxThread(ITransport_CAN& can,
     }
 }
 
-void protocolThread(FrameQueue& queue)
+void protocolThread(FrameQueue &queue,
+                    CAN_Dispatcher &dispatcher)
 {
-    auto lastTick = steady_clock::now();
+    using clock = std::chrono::steady_clock;
+    auto lastTick = clock::now();
 
-    while(queue.isRunning())
+    while (true)
     {
-        Frame f {};
+        Frame f;
 
-        // Czekaj max 1 ms
-        bool ok = queue.waitAndPop(f, milliseconds(1));
-
-        if(!queue.isRunning())
+        if (!queue.pop(f))
             break;
 
-        // Jeśli przyszła ramka
-        if(f.len > 0)
-        {
-            std::cout << "RX ID: 0x"
-                      << std::hex << f.id
-                      << std::dec << std::endl;
+        dispatcher.dispatch(f.id, f.data, f.len);
 
-            // TODO:
-            // dispatcher.dispatch(...)
-        }
-
-        // 1ms tick dla ISO-TP / UDS
-        auto now = steady_clock::now();
-        if(now - lastTick >= milliseconds(1))
+        auto now = clock::now();
+        if (now - lastTick >= std::chrono::milliseconds(1))
         {
             lastTick = now;
-
-            // TODO:
-            // isotp.update();
-            // uds.update();
+            // tutaj później będzie isotp.update();
         }
     }
 }
@@ -72,20 +74,25 @@ int main()
 {
     Transport_CAN_Linux can("can0");
 
-    if(!can.isValid())
+    if (!can.isValid())
     {
         std::cerr << "CAN init failed\n";
         return 1;
     }
 
     FrameQueue queue;
+    CAN_Dispatcher dispatcher;
+    DebugHandler debug;
+
+    dispatcher.registerHandler(&debug);
 
     std::thread rxThread(canRxThread,
                          std::ref(can),
                          std::ref(queue));
 
     std::thread protoThread(protocolThread,
-                            std::ref(queue));
+                            std::ref(queue),
+                            std::ref(dispatcher));
 
     std::cout << "System running...\n";
     std::cout << "Press ENTER to stop\n";

@@ -4,6 +4,7 @@ ecu_platform: \
   /usr/lib/gcc/aarch64-linux-gnu/14/crtbeginS.o \
   CMakeFiles/ecu_platform.dir/src/main.cpp.o \
   CMakeFiles/ecu_platform.dir/src/transport/Transport_CAN_Linux.cpp.o \
+  CMakeFiles/ecu_platform.dir/src/core/CAN_Dispatcher.cpp.o \
   /usr/lib/gcc/aarch64-linux-gnu/14/libstdc++.so \
   /usr/lib/gcc/aarch64-linux-gnu/14/../../../aarch64-linux-gnu/libm.so \
   /usr/lib/gcc/aarch64-linux-gnu/14/../../../aarch64-linux-gnu/libm.so \
@@ -42,6 +43,8 @@ ecu_platform: \
 CMakeFiles/ecu_platform.dir/src/main.cpp.o:
 
 CMakeFiles/ecu_platform.dir/src/transport/Transport_CAN_Linux.cpp.o:
+
+CMakeFiles/ecu_platform.dir/src/core/CAN_Dispatcher.cpp.o:
 
 /usr/lib/gcc/aarch64-linux-gnu/14/libstdc++.so:
 
