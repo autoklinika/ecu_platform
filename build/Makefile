@@ -225,6 +225,30 @@ src/transport/Transport_CAN_Linux.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/transport/Transport_CAN_Linux.cpp.s
 .PHONY : src/transport/Transport_CAN_Linux.cpp.s
 
+src/uds/UDS_Client.o: src/uds/UDS_Client.cpp.o
+.PHONY : src/uds/UDS_Client.o
+
+# target to build an object file
+src/uds/UDS_Client.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/uds/UDS_Client.cpp.o
+.PHONY : src/uds/UDS_Client.cpp.o
+
+src/uds/UDS_Client.i: src/uds/UDS_Client.cpp.i
+.PHONY : src/uds/UDS_Client.i
+
+# target to preprocess a source file
+src/uds/UDS_Client.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/uds/UDS_Client.cpp.i
+.PHONY : src/uds/UDS_Client.cpp.i
+
+src/uds/UDS_Client.s: src/uds/UDS_Client.cpp.s
+.PHONY : src/uds/UDS_Client.s
+
+# target to generate assembly for a file
+src/uds/UDS_Client.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/uds/UDS_Client.cpp.s
+.PHONY : src/uds/UDS_Client.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -246,6 +270,9 @@ help:
 	@echo "... src/transport/Transport_CAN_Linux.o"
 	@echo "... src/transport/Transport_CAN_Linux.i"
 	@echo "... src/transport/Transport_CAN_Linux.s"
+	@echo "... src/uds/UDS_Client.o"
+	@echo "... src/uds/UDS_Client.i"
+	@echo "... src/uds/UDS_Client.s"
 .PHONY : help
 
 

@@ -8,6 +8,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/ecu_platform.dir/src/main.cpp.o.d"
   "CMakeFiles/ecu_platform.dir/src/transport/Transport_CAN_Linux.cpp.o"
   "CMakeFiles/ecu_platform.dir/src/transport/Transport_CAN_Linux.cpp.o.d"
+  "CMakeFiles/ecu_platform.dir/src/uds/UDS_Client.cpp.o"
+  "CMakeFiles/ecu_platform.dir/src/uds/UDS_Client.cpp.o.d"
   "ecu_platform"
   "ecu_platform.pdb"
 )

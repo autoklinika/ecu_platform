@@ -8,6 +8,7 @@ add_executable(ecu_platform
     src/transport/Transport_CAN_Linux.cpp
     src/core/CAN_Dispatcher.cpp
     src/isotp/ISOTP.cpp
+    src/uds/UDS_Client.cpp
 )
 
 target_include_directories(ecu_platform PRIVATE
@@ -15,4 +16,5 @@ target_include_directories(ecu_platform PRIVATE
     ${CMAKE_SOURCE_DIR}/src/transport
     ${CMAKE_SOURCE_DIR}/src/core
     ${CMAKE_SOURCE_DIR}/src/isotp
+    ${CMAKE_SOURCE_DIR}/src/uds
 )

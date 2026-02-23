@@ -85,12 +85,12 @@ clean: CMakeFiles/ecu_platform.dir/clean
 CMakeFiles/ecu_platform.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/ecutesret/ecu_platform/build/CMakeFiles --progress-num=1,2,3,4,5 "Built target ecu_platform"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/ecutesret/ecu_platform/build/CMakeFiles --progress-num=1,2,3,4,5,6 "Built target ecu_platform"
 .PHONY : CMakeFiles/ecu_platform.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/ecu_platform.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ecutesret/ecu_platform/build/CMakeFiles 5
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ecutesret/ecu_platform/build/CMakeFiles 6
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ecu_platform.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/ecutesret/ecu_platform/build/CMakeFiles 0
 .PHONY : CMakeFiles/ecu_platform.dir/rule
@@ -102,7 +102,7 @@ ecu_platform: CMakeFiles/ecu_platform.dir/rule
 # codegen rule for target.
 CMakeFiles/ecu_platform.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/ecutesret/ecu_platform/build/CMakeFiles --progress-num=1,2,3,4,5 "Finished codegen for target ecu_platform"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/ecutesret/ecu_platform/build/CMakeFiles --progress-num=1,2,3,4,5,6 "Finished codegen for target ecu_platform"
 .PHONY : CMakeFiles/ecu_platform.dir/codegen
 
 # clean rule for target.

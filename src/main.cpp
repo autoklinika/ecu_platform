@@ -4,6 +4,7 @@
 #include "core/CAN_FrameHandler.h"
 #include "transport/Transport_CAN_Linux.h"
 #include "isotp/ISOTP.h"
+#include "uds/UDS_Client.h"
 
 #include <thread>
 #include <iostream>
@@ -12,22 +13,6 @@
 #include <vector>
 
 using namespace std::chrono;
-
-// =======================
-// Debug handler (opcjonalny)
-// =======================
-class DebugHandler : public CAN_FrameHandler
-{
-public:
-    void handleFrame(uint32_t id,
-                     const uint8_t* data,
-                     uint8_t len) override
-    {
-        std::cout << "DISPATCH 0x"
-                  << std::hex << id
-                  << std::dec << std::endl;
-    }
-};
 
 // =======================
 // CAN RX THREAD
@@ -60,62 +45,18 @@ void protocolThread(FrameQueue &queue,
                     CAN_Dispatcher &dispatcher,
                     ISOTP& isotp)
 {
-    auto lastTick = steady_clock::now();
-
-    while (true)
+    while(true)
     {
         Frame f;
 
-        if (!queue.pop(f))
+        if(!queue.pop(f))
             break;
 
+        // 1️⃣ Dispatcher → przekazuje do ISOTP
         dispatcher.dispatch(f.id, f.data, f.len);
 
-        // ISO-TP state machine tick
+        // 2️⃣ ISO-TP tick
         isotp.update();
-
-        // Sprawdzenie czy złożona wiadomość
-        if(isotp.hasMessage())
-        {
-            auto response = isotp.receive();
-
-            std::cout << "UDS Response: ";
-            for(auto b : response)
-                std::cout << std::hex << (int)b << " ";
-            std::cout << std::dec << std::endl;
-
-            // Positive Response Session
-            if(response.size() >= 2 &&
-               response[0] == 0x50)
-            {
-                std::cout << "Session started\n";
-            }
-
-            // Positive Response VIN
-            if(response.size() > 3 &&
-               response[0] == 0x62 &&
-               response[1] == 0xF1 &&
-               response[2] == 0x90)
-            {
-                std::string vin(response.begin()+3, response.end());
-                std::cout << "VIN: " << vin << std::endl;
-            }
-
-            // Negative response
-            if(response.size() >= 3 &&
-               response[0] == 0x7F)
-            {
-                std::cout << "Negative Response NRC: 0x"
-                          << std::hex << (int)response[2]
-                          << std::dec << std::endl;
-            }
-        }
-
-        auto now = steady_clock::now();
-        if (now - lastTick >= milliseconds(1))
-        {
-            lastTick = now;
-        }
     }
 }
 
@@ -126,7 +67,7 @@ int main()
 {
     Transport_CAN_Linux can("can0");
 
-    if (!can.isValid())
+    if(!can.isValid())
     {
         std::cerr << "CAN init failed\n";
         return 1;
@@ -142,9 +83,9 @@ int main()
     uint32_t ecuToTester = 0x18DAF930;
 
     ISOTP isotp(can, testerToEcu, ecuToTester);
+    UDS_Client uds(isotp);
 
     dispatcher.registerHandler(&isotp);
-    //dispatcher.registerHandler(new DebugHandler()); // opcjonalnie
 
     std::thread rxThread(canRxThread,
                          std::ref(can),
@@ -160,25 +101,33 @@ int main()
     // ==========================
     // TEST SEKWENCJA UDS
     // ==========================
+
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
-    // 1️⃣ Diagnostic Session Control (Extended)
-    std::vector<uint8_t> sessionRequest = {0x10, 0x03};
-
-    if(isotp.send(sessionRequest))
-        std::cout << "Session request sent\n";
+    // 1️⃣ Extended Session
+    if(uds.startExtendedSession())
+    {
+        std::cout << "Extended session started\n";
+    }
     else
-        std::cout << "ISO-TP busy (session)\n";
+    {
+        std::cout << "Session start failed\n";
+        return 1;
+    }
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
 
     // 2️⃣ Read VIN
-    std::vector<uint8_t> vinRequest = {0x22, 0xF1, 0x90};
+    auto vin = uds.readVIN();
 
-    if(isotp.send(vinRequest))
-        std::cout << "VIN request sent\n";
+    if(vin)
+    {
+        std::cout << "VIN: " << *vin << std::endl;
+    }
     else
-        std::cout << "ISO-TP busy (VIN)\n";
+    {
+        std::cout << "VIN read failed\n";
+    }
 
     std::cout << "Press ENTER to stop\n";
     std::cin.get();
