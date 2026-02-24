@@ -10,6 +10,8 @@ add_executable(ecu_platform
     src/isotp/ISOTP.cpp
     src/uds/UDS_Client.cpp
     src/uds/UDS_Core.cpp
+    src/virtual_cockpit/VirtualCockpit.cpp
+    src/ecu/sac/SAC_Module.cpp
 )
 
 target_include_directories(ecu_platform PRIVATE
@@ -18,4 +20,5 @@ target_include_directories(ecu_platform PRIVATE
     ${CMAKE_SOURCE_DIR}/src/core
     ${CMAKE_SOURCE_DIR}/src/isotp
     ${CMAKE_SOURCE_DIR}/src/uds
+    ${CMAKE_SOURCE_DIR}/src/ecu/sac
 )

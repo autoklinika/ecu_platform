@@ -1,6 +1,13 @@
 #include "VirtualCockpit.h"
 #include <iostream>
-#include <thread>
+#include <cstring>
+
+
+using namespace std::chrono;
+
+// ========================
+// Constructor / Destructor
+// ========================
 
 VirtualCockpit::VirtualCockpit()
 {
@@ -10,6 +17,10 @@ VirtualCockpit::~VirtualCockpit()
 {
     stop();
 }
+
+// ========================
+// Public API
+// ========================
 
 void VirtualCockpit::start()
 {
@@ -29,8 +40,6 @@ void VirtualCockpit::stop()
 
     if(engineThread.joinable())
         engineThread.join();
-
-    state = State::Stopped;
 }
 
 VirtualCockpit::State VirtualCockpit::getState() const
@@ -46,7 +55,6 @@ bool VirtualCockpit::configureCAN(const std::string& iface, int bitrate)
     canInterface = iface;
     canBitrate = bitrate;
     state = State::Configured;
-
     return true;
 }
 
@@ -69,19 +77,15 @@ void VirtualCockpit::disconnect()
     pushCommand(CommandType::Disconnect);
 }
 
-void VirtualCockpit::pushCommand(CommandType type)
-{
-    std::lock_guard<std::mutex> lock(queueMutex);
-    commandQueue.push({type});
-}
+// ========================
+// Engine Loop
+// ========================
 
 void VirtualCockpit::engineLoop()
 {
-    using clock = std::chrono::steady_clock;
-
     while(running)
     {
-        auto cycleStart = clock::now();
+        auto cycleStart = steady_clock::now();
 
         processCommands();
         engineTick();
@@ -89,24 +93,22 @@ void VirtualCockpit::engineLoop()
         std::this_thread::sleep_until(cycleStart + CYCLE_TIME);
     }
 
-    // Clean shutdown
-    if(canOpen)
-        closeCAN();
+    closeStack();
 }
 
 void VirtualCockpit::processCommands()
 {
-    std::queue<Command> localQueue;
+    std::queue<Command> local;
 
     {
         std::lock_guard<std::mutex> lock(queueMutex);
-        std::swap(localQueue, commandQueue);
+        std::swap(local, commandQueue);
     }
 
-    while(!localQueue.empty())
+    while(!local.empty())
     {
-        auto cmd = localQueue.front();
-        localQueue.pop();
+        auto cmd = local.front();
+        local.pop();
 
         switch(cmd.type)
         {
@@ -115,7 +117,7 @@ void VirtualCockpit::processCommands()
                 {
                     state = State::Connecting;
 
-                    if(openCAN())
+                    if(openStack())
                         state = State::Connected;
                     else
                         state = State::Error;
@@ -125,7 +127,7 @@ void VirtualCockpit::processCommands()
             case CommandType::Disconnect:
                 if(state == State::Connected)
                 {
-                    closeCAN();
+                    closeStack();
                     state = State::Configured;
                 }
                 break;
@@ -139,35 +141,128 @@ void VirtualCockpit::processCommands()
 
 void VirtualCockpit::engineTick()
 {
-    if(state == State::Connected)
+    if(state != State::Connected)
+        return;
+
+    Frame f;
+
+    // 1️⃣ Przetwarzamy wszystkie ramki
+    while(frameQueue && frameQueue->tryPop(f))
     {
-        // 🔥 tutaj będzie:
-        // transport.update();
-        // dispatcher.update();
-        // isotp.update();
-        // uds.update();
-        // scheduler.update();
+        dispatcher->dispatch(f.id, f.data, f.len);
+    }
+
+    // 2️⃣ Dajemy ISO-TP kilka cykli (ważne!)
+    if(isotp)
+    {
+        for(int i = 0; i < 3; ++i)
+            isotp->update();
+    }
+
+    // 3️⃣ Dopiero teraz warstwa UDS
+    if(udsCore)
+        udsCore->update();
+
+    // 4️⃣ Na końcu ECU logic
+    if(sac)
+    {
+        sac->update();
+
+        if(sac->isReady())
+        {
+            std::cout << "\n=== SAC IDENTIFICATION ===\n";
+            std::cout << "VIN: " << sac->getVIN() << "\n";
+            std::cout << "SW : " << sac->getSW()  << "\n";
+            std::cout << "HW : " << sac->getHW()  << "\n";
+            std::cout << "==========================\n";
+
+            sac.reset();
+        }
+
+        if(sac && sac->hasError())
+        {
+            std::cout << "SAC identification ERROR\n";
+            sac.reset();
+        }
     }
 }
 
-bool VirtualCockpit::openCAN()
-{
-    canTransport = std::make_unique<Transport_CAN_Linux>();
+// ========================
+// Stack Control
+// ========================
 
-    if(!canTransport->open(canInterface, canBitrate))
+bool VirtualCockpit::openStack()
+{
+    transport = std::make_unique<Transport_CAN_Linux>();
+
+    if(!transport->open(canInterface, canBitrate))
         return false;
 
-    canOpen = true;
+    frameQueue = std::make_unique<FrameQueue>();
+    dispatcher = std::make_unique<CAN_Dispatcher>();
+
+    uint32_t testerToEcu = 0x18DA30F9;
+    uint32_t ecuToTester = 0x18DAF930;
+
+    isotp = std::make_unique<ISOTP>(*transport, testerToEcu, ecuToTester);
+    udsCore = std::make_unique<UDS_Core>(*isotp);
+
+    dispatcher->registerHandler(isotp.get());
+    // ===== ECU Module =====
+    if (selectedECU == "SAC")
+    {
+        sac = std::make_unique<SAC_Module>(*udsCore);
+        sac->startIdentification();
+    }
+
+    rxThread = std::thread(&VirtualCockpit::rxLoop, this);
+
     return true;
 }
 
-void VirtualCockpit::closeCAN()
-{
-    if(canTransport)
+void VirtualCockpit::closeStack()
+{   
+    sac.reset();
+    
+    if(transport)
     {
-        canTransport->close();
-        canTransport.reset();
+        transport->close();
     }
 
-    canOpen = false;
+    if(rxThread.joinable())
+        rxThread.join();
+
+    udsCore.reset();
+    isotp.reset();
+    dispatcher.reset();
+    frameQueue.reset();
+    transport.reset();
+}
+
+void VirtualCockpit::rxLoop()
+{
+    while(running && state == State::Connected)
+    {
+        uint32_t id;
+        uint8_t data[8];
+        uint8_t len;
+
+        if(transport->receiveFrame(id, data, len))
+        {
+            Frame f{};
+            f.id = id;
+            f.len = len;
+            std::memcpy(f.data, data, len);
+
+            frameQueue->push(f);
+        }
+    }
+}
+
+// ========================
+
+void VirtualCockpit::pushCommand(CommandType type)
+{
+    std::lock_guard<std::mutex> lock(queueMutex);
+    commandQueue.push({type});
 }

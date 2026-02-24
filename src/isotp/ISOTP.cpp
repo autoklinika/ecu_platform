@@ -1,6 +1,7 @@
 #include "ISOTP.h"
 #include <cstring>
 
+
 using namespace std::chrono;
 
 ISOTP::ISOTP(ITransport_CAN& can,
@@ -21,23 +22,27 @@ void ISOTP::handleFrame(uint32_t id,
 
     uint8_t pciType = data[0] >> 4;
 
-    if(pciType == 0x0) // Single Frame
+    if (pciType == 0x0) // Single Frame
     {
         uint8_t size = data[0] & 0x0F;
         rxBuffer_.assign(&data[1], &data[1] + size);
         messageReady_ = true;
     }
-    else if(pciType == 0x1) // First Frame
+    else if (pciType == 0x1) // First Frame
     {
+        messageReady_ = false; // 🔥 KLUCZOWE
+
         rxExpectedLength_ = ((data[0] & 0x0F) << 8) | data[1];
+
         rxBuffer_.clear();
         rxBuffer_.insert(rxBuffer_.end(), &data[2], &data[8]);
+
         rxState_ = RxState::Receiving;
         rxNextSN_ = 1;
 
         sendFlowControl();
     }
-    else if(pciType == 0x2 && rxState_ == RxState::Receiving) // CF
+    else if (pciType == 0x2 && rxState_ == RxState::Receiving) // CF
     {
         uint8_t sn = data[0] & 0x0F;
         if(sn != rxNextSN_)
@@ -53,7 +58,7 @@ void ISOTP::handleFrame(uint32_t id,
 
         rxBuffer_.insert(rxBuffer_.end(), &data[1], &data[1] + copyLen);
 
-        if(rxBuffer_.size() >= rxExpectedLength_)
+        if(rxBuffer_.size() == rxExpectedLength_)
         {
             rxState_ = RxState::Idle;
             messageReady_ = true;

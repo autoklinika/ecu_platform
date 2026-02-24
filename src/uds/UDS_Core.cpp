@@ -26,8 +26,7 @@ bool UDS_Core::request(const std::vector<uint8_t>& payload)
 void UDS_Core::update()
 {
     // ISO-TP tick (nie blokuje)
-    isotp_.update();
-
+     
     auto now = steady_clock::now();
 
     if(state_ == State::WaitingResponse)
