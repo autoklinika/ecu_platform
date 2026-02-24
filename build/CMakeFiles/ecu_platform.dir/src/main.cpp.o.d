@@ -186,6 +186,8 @@ CMakeFiles/ecu_platform.dir/src/main.cpp.o: \
  /home/ecutesret/ecu_platform/src/core/CAN_FrameHandler.h \
  /home/ecutesret/ecu_platform/src/isotp/ISOTP.h \
  /home/ecutesret/ecu_platform/src/uds/UDS_Core.h \
+ /home/ecutesret/ecu_platform/src/ecu/sac/SAC_Module.h \
+ /home/ecutesret/ecu_platform/src/ecu/sac/IECU_Module.h \
  /usr/include/c++/14/iostream /usr/include/c++/14/ostream \
  /usr/include/c++/14/ios /usr/include/c++/14/bits/ios_base.h \
  /usr/include/c++/14/bits/locale_classes.h \
