@@ -273,6 +273,30 @@ src/uds/UDS_Core.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/uds/UDS_Core.cpp.s
 .PHONY : src/uds/UDS_Core.cpp.s
 
+src/virtual_cockpit/VirtualCockpit.o: src/virtual_cockpit/VirtualCockpit.cpp.o
+.PHONY : src/virtual_cockpit/VirtualCockpit.o
+
+# target to build an object file
+src/virtual_cockpit/VirtualCockpit.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/virtual_cockpit/VirtualCockpit.cpp.o
+.PHONY : src/virtual_cockpit/VirtualCockpit.cpp.o
+
+src/virtual_cockpit/VirtualCockpit.i: src/virtual_cockpit/VirtualCockpit.cpp.i
+.PHONY : src/virtual_cockpit/VirtualCockpit.i
+
+# target to preprocess a source file
+src/virtual_cockpit/VirtualCockpit.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/virtual_cockpit/VirtualCockpit.cpp.i
+.PHONY : src/virtual_cockpit/VirtualCockpit.cpp.i
+
+src/virtual_cockpit/VirtualCockpit.s: src/virtual_cockpit/VirtualCockpit.cpp.s
+.PHONY : src/virtual_cockpit/VirtualCockpit.s
+
+# target to generate assembly for a file
+src/virtual_cockpit/VirtualCockpit.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_platform.dir/build.make CMakeFiles/ecu_platform.dir/src/virtual_cockpit/VirtualCockpit.cpp.s
+.PHONY : src/virtual_cockpit/VirtualCockpit.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -300,6 +324,9 @@ help:
 	@echo "... src/uds/UDS_Core.o"
 	@echo "... src/uds/UDS_Core.i"
 	@echo "... src/uds/UDS_Core.s"
+	@echo "... src/virtual_cockpit/VirtualCockpit.o"
+	@echo "... src/virtual_cockpit/VirtualCockpit.i"
+	@echo "... src/virtual_cockpit/VirtualCockpit.s"
 .PHONY : help
 
 
