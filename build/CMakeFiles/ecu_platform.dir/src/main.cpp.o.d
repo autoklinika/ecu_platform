@@ -139,7 +139,6 @@ CMakeFiles/ecu_platform.dir/src/main.cpp.o: \
  /home/ecutesret/ecu_platform/src/core/CAN_Dispatcher.h \
  /home/ecutesret/ecu_platform/src/core/CAN_FrameHandler.h \
  /home/ecutesret/ecu_platform/src/transport/Transport_CAN_Linux.h \
- /home/ecutesret/ecu_platform/src/transport/ITransport_CAN.h \
  /usr/include/c++/14/string /usr/include/c++/14/bits/char_traits.h \
  /usr/include/c++/14/bits/localefwd.h \
  /usr/include/aarch64-linux-gnu/c++/14/bits/c++locale.h \
@@ -167,6 +166,7 @@ CMakeFiles/ecu_platform.dir/src/main.cpp.o: \
  /usr/include/aarch64-linux-gnu/bits/stdio_lim.h \
  /usr/include/c++/14/bits/charconv.h \
  /usr/include/c++/14/bits/basic_string.tcc \
+ /home/ecutesret/ecu_platform/src/transport/ITransport_CAN.h \
  /home/ecutesret/ecu_platform/src/isotp/ISOTP.h \
  /usr/include/c++/14/chrono \
  /home/ecutesret/ecu_platform/src/uds/UDS_Core.h \

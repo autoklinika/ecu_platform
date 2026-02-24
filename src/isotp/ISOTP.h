@@ -4,7 +4,7 @@
 #include <vector>
 #include <chrono>
 #include "core/CAN_FrameHandler.h"
-#include "transport/Transport_CAN_Linux.h"
+#include "transport/ITransport_CAN.h"
 
 class ISOTP : public CAN_FrameHandler
 {

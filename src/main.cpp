@@ -11,6 +11,7 @@
 #include <cstring>
 #include <chrono>
 #include <vector>
+#include <atomic>
 
 using namespace std::chrono;
 
@@ -18,9 +19,10 @@ using namespace std::chrono;
 // CAN RX THREAD
 // =======================
 void canRxThread(ITransport_CAN& can,
-                 FrameQueue& queue)
+                 FrameQueue& queue,
+                 std::atomic<bool>& running)
 {
-    while(true)
+    while(running)
     {
         uint32_t id;
         uint8_t data[8];
@@ -44,23 +46,22 @@ void canRxThread(ITransport_CAN& can,
 void protocolThread(FrameQueue &queue,
                     CAN_Dispatcher &dispatcher,
                     ISOTP& isotp,
-                    UDS_Core& udsCore)
+                    UDS_Core& udsCore,
+                    std::atomic<bool>& running)
 {
-    while(true)
+    while(running)
     {
         Frame f;
 
-        if(!queue.pop(f))
-            break;
+        while(queue.tryPop(f))
+        {
+            dispatcher.dispatch(f.id, f.data, f.len);
+        }
 
-        // 1️⃣ Dispatcher → ISOTP
-        dispatcher.dispatch(f.id, f.data, f.len);
-
-        // 2️⃣ ISO-TP tick
         isotp.update();
-
-        // 3️⃣ UDS Core tick
         udsCore.update();
+
+        std::this_thread::sleep_for(milliseconds(1));
     }
 }
 
@@ -69,13 +70,18 @@ void protocolThread(FrameQueue &queue,
 // =======================
 int main()
 {
-    Transport_CAN_Linux can("can0");
+    const std::string iface = "can0";
+    const int bitrate = 250000;   // ręcznie ustawione
 
-    if(!can.isValid())
+    Transport_CAN_Linux can;
+
+    if(!can.open(iface, bitrate))
     {
-        std::cerr << "CAN init failed\n";
+        std::cerr << "CAN open failed\n";
         return 1;
     }
+
+    std::atomic<bool> running{true};
 
     FrameQueue queue;
     CAN_Dispatcher dispatcher;
@@ -89,15 +95,18 @@ int main()
 
     dispatcher.registerHandler(&isotp);
 
+    // ===== Start threads =====
     std::thread rxThread(canRxThread,
                          std::ref(can),
-                         std::ref(queue));
+                         std::ref(queue),
+                         std::ref(running));
 
     std::thread protoThread(protocolThread,
                             std::ref(queue),
                             std::ref(dispatcher),
                             std::ref(isotp),
-                            std::ref(udsCore));
+                            std::ref(udsCore),
+                            std::ref(running));
 
     std::cout << "System running...\n";
 
@@ -110,13 +119,12 @@ int main()
     if(!udsCore.request({0x10, 0x03}))
     {
         std::cout << "Session request send failed\n";
+        running = false;
         return 1;
     }
 
     while(udsCore.getState() == UDS_Core::State::WaitingResponse)
-    {
         std::this_thread::sleep_for(milliseconds(5));
-    }
 
     if(udsCore.getState() == UDS_Core::State::Done)
     {
@@ -130,54 +138,60 @@ int main()
         else
         {
             std::cout << "Session negative response\n";
-            return 1;
+            running = false;
         }
     }
     else
     {
         std::cout << "Session timeout/error\n";
-        return 1;
+        running = false;
     }
 
     // ==========================
     // 2️⃣ Read VIN
     // ==========================
 
-    if(!udsCore.request({0x22, 0xF1, 0x90}))
+    if(running)
     {
-        std::cout << "VIN request send failed\n";
-        return 1;
-    }
-
-    while(udsCore.getState() == UDS_Core::State::WaitingResponse)
-    {
-        std::this_thread::sleep_for(milliseconds(5));
-    }
-
-    if(udsCore.getState() == UDS_Core::State::Done)
-    {
-        auto resp = udsCore.getResponse();
-
-        if(resp.size() > 3 && resp[0] == 0x62)
+        if(!udsCore.request({0x22, 0xF1, 0x90}))
         {
-            std::string vin(resp.begin() + 3, resp.end());
-            std::cout << "VIN: " << vin << "\n";
+            std::cout << "VIN request send failed\n";
+            running = false;
+        }
+
+        while(running &&
+              udsCore.getState() == UDS_Core::State::WaitingResponse)
+        {
+            std::this_thread::sleep_for(milliseconds(5));
+        }
+
+        if(udsCore.getState() == UDS_Core::State::Done)
+        {
+            auto resp = udsCore.getResponse();
+
+            if(resp.size() > 3 && resp[0] == 0x62)
+            {
+                std::string vin(resp.begin() + 3, resp.end());
+                std::cout << "VIN: " << vin << "\n";
+            }
+            else
+            {
+                std::cout << "VIN invalid response\n";
+            }
         }
         else
         {
-            std::cout << "VIN invalid response\n";
+            std::cout << "VIN timeout/error\n";
         }
-    }
-    else
-    {
-        std::cout << "VIN timeout/error\n";
     }
 
     std::cout << "Press ENTER to stop\n";
     std::cin.get();
 
+    // ===== Clean shutdown =====
+    running = false;
     queue.stop();
-    can.closeSocket();
+    can.close();
 
     rxThread.join();
     protoThread.join();

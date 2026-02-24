@@ -1,87 +1,92 @@
 #include "Transport_CAN_Linux.h"
 
+#include <iostream>
 #include <cstring>
 #include <unistd.h>
-#include <sys/ioctl.h>
 #include <net/if.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
 #include <linux/can.h>
 #include <linux/can/raw.h>
-#include <sys/socket.h>
 
-Transport_CAN_Linux::Transport_CAN_Linux(const std::string& ifname)
+Transport_CAN_Linux::Transport_CAN_Linux()
 {
-    socket_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
-    if(socket_ < 0)
-        return;
+}
+
+Transport_CAN_Linux::~Transport_CAN_Linux()
+{
+    close();
+}
+
+bool Transport_CAN_Linux::open(const std::string& iface, int /*bitrate*/)
+{
+    socketFd = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+    if(socketFd < 0)
+        return false;
 
     struct ifreq ifr {};
-    std::strncpy(ifr.ifr_name, ifname.c_str(), IFNAMSIZ - 1);
+    std::strncpy(ifr.ifr_name, iface.c_str(), IFNAMSIZ - 1);
 
-    if(ioctl(socket_, SIOCGIFINDEX, &ifr) < 0)
-        return;
+    if(ioctl(socketFd, SIOCGIFINDEX, &ifr) < 0)
+        return false;
 
     struct sockaddr_can addr {};
     addr.can_family  = AF_CAN;
     addr.can_ifindex = ifr.ifr_ifindex;
 
-    if(bind(socket_, reinterpret_cast<struct sockaddr*>(&addr),
-            sizeof(addr)) < 0)
-        return;
+    if(bind(socketFd, (struct sockaddr*)&addr, sizeof(addr)) < 0)
+        return false;
+
+    return true;
 }
 
-Transport_CAN_Linux::~Transport_CAN_Linux()
+void Transport_CAN_Linux::close()
 {
-    closeSocket();
-}
-
-void Transport_CAN_Linux::closeSocket()
-{
-    if(socket_ >= 0)
+    if(socketFd >= 0)
     {
-        close(socket_);
-        socket_ = -1;
+        ::close(socketFd);
+        socketFd = -1;
     }
 }
 
-bool Transport_CAN_Linux::isValid() const
-{
-    return socket_ >= 0;
-}
 
 bool Transport_CAN_Linux::sendFrame(uint32_t id,
                                     const uint8_t* data,
                                     uint8_t len)
 {
-    if(socket_ < 0)
+    if(socketFd < 0)
         return false;
 
     struct can_frame frame {};
-    
-    frame.can_id  = (id & CAN_EFF_MASK) | CAN_EFF_FLAG;  // 🔴 KLUCZOWE
+    frame.can_id  = id | CAN_EFF_FLAG;
     frame.can_dlc = len;
-
     std::memcpy(frame.data, data, len);
 
-    return write(socket_, &frame, sizeof(frame)) == sizeof(frame);
+    return write(socketFd, &frame, sizeof(frame)) == sizeof(frame);
 }
 
 bool Transport_CAN_Linux::receiveFrame(uint32_t& id,
                                        uint8_t* data,
                                        uint8_t& len)
 {
-    struct can_frame frame {};
-    int nbytes = read(socket_, &frame, sizeof(frame));
-
-    if(nbytes <= 0)
+    if(socketFd < 0)
         return false;
 
-    if(frame.can_id & CAN_EFF_FLAG)
-        id = frame.can_id & CAN_EFF_MASK;   // 29-bit
-    else
-        id = frame.can_id & CAN_SFF_MASK;   // 11-bit
+    struct can_frame frame {};
 
+    int n = read(socketFd, &frame, sizeof(frame));
+    if(n <= 0)
+        return false;
+
+    id  = frame.can_id & CAN_EFF_MASK;
     len = frame.can_dlc;
     std::memcpy(data, frame.data, len);
 
     return true;
+}
+
+
+bool Transport_CAN_Linux::isValid() const
+{
+    return socketFd >= 0;
 }

@@ -9,7 +9,7 @@
 class FrameQueue
 {
 public:
-    void push(const Frame& f)
+    void push(const Frame &f)
     {
         {
             std::lock_guard<std::mutex> lock(mutex_);
@@ -18,15 +18,25 @@ public:
         cv_.notify_one();
     }
 
-    bool pop(Frame& out)
+    bool pop(Frame &out)
     {
         std::unique_lock<std::mutex> lock(mutex_);
 
-        cv_.wait(lock, [&]{
-            return !queue_.empty() || !running_;
-        });
+        cv_.wait(lock, [&]
+                 { return !queue_.empty() || !running_; });
 
-        if(queue_.empty())
+        if (queue_.empty())
+            return false;
+
+        out = queue_.front();
+        queue_.pop();
+        return true;
+    }
+    bool tryPop(Frame &out)
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+
+        if (queue_.empty())
             return false;
 
         out = queue_.front();
