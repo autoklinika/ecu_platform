@@ -1,43 +1,27 @@
 #include "VirtualCockpit.h"
-#include <iostream>
 #include <cstring>
-
+#include <thread>
 
 using namespace std::chrono;
 
-// ========================
-// Constructor / Destructor
-// ========================
-
-VirtualCockpit::VirtualCockpit()
-{
-}
+VirtualCockpit::VirtualCockpit() {}
 
 VirtualCockpit::~VirtualCockpit()
 {
     stop();
 }
 
-// ========================
-// Public API
-// ========================
-
 void VirtualCockpit::start()
 {
-    if(running)
-        return;
-
+    if(running) return;
     running = true;
     engineThread = std::thread(&VirtualCockpit::engineLoop, this);
 }
 
 void VirtualCockpit::stop()
 {
-    if(!running)
-        return;
-
+    if(!running) return;
     pushCommand(CommandType::Stop);
-
     if(engineThread.joinable())
         engineThread.join();
 }
@@ -45,6 +29,12 @@ void VirtualCockpit::stop()
 VirtualCockpit::State VirtualCockpit::getState() const
 {
     return state.load();
+}
+
+VirtualCockpit::RuntimeData VirtualCockpit::getRuntime() const
+{
+    std::lock_guard<std::mutex> lock(runtimeMutex);
+    return runtime;
 }
 
 bool VirtualCockpit::configureCAN(const std::string& iface, int bitrate)
@@ -58,12 +48,9 @@ bool VirtualCockpit::configureCAN(const std::string& iface, int bitrate)
     return true;
 }
 
-bool VirtualCockpit::selectECU(const std::string& ecuName)
+bool VirtualCockpit::selectECU(const std::string& ecu)
 {
-    if(state == State::Connected)
-        return false;
-
-    selectedECU = ecuName;
+    selectedECU = ecu;
     return true;
 }
 
@@ -77,29 +64,39 @@ void VirtualCockpit::disconnect()
     pushCommand(CommandType::Disconnect);
 }
 
-// ========================
-// Engine Loop
-// ========================
+void VirtualCockpit::pushCommand(CommandType t)
+{
+    std::lock_guard<std::mutex> lock(queueMutex);
+    commandQueue.push({t});
+}
+
+void VirtualCockpit::setError(const std::string& msg)
+{
+    logger.log("ERROR: " + msg);
+
+    {
+        std::lock_guard<std::mutex> lock(runtimeMutex);
+        runtime.lastError = msg;
+    }
+
+    state = State::Error;
+}
 
 void VirtualCockpit::engineLoop()
 {
     while(running)
     {
-        auto cycleStart = steady_clock::now();
-
+        auto start = steady_clock::now();
         processCommands();
         engineTick();
-
-        std::this_thread::sleep_until(cycleStart + CYCLE_TIME);
+        std::this_thread::sleep_until(start + CYCLE_TIME);
     }
-
     closeStack();
 }
 
 void VirtualCockpit::processCommands()
 {
     std::queue<Command> local;
-
     {
         std::lock_guard<std::mutex> lock(queueMutex);
         std::swap(local, commandQueue);
@@ -110,85 +107,103 @@ void VirtualCockpit::processCommands()
         auto cmd = local.front();
         local.pop();
 
-        switch(cmd.type)
+        if(cmd.type == CommandType::Stop)
         {
-            case CommandType::Connect:
-                if(state == State::Configured)
-                {
-                    state = State::Connecting;
+            running = false;
+        }
+        else if(cmd.type == CommandType::Connect &&
+                state == State::Configured)
+        {
+            state = State::Connecting;
 
-                    if(openStack())
-                        state = State::Connected;
-                    else
-                        state = State::Error;
-                }
-                break;
-
-            case CommandType::Disconnect:
-                if(state == State::Connected)
-                {
-                    closeStack();
-                    state = State::Configured;
-                }
-                break;
-
-            case CommandType::Stop:
-                running = false;
-                break;
+            if(openStack())
+                state = State::Connected;
+            else
+                setError("Stack open failed");
+        }
+        else if(cmd.type == CommandType::Disconnect)
+        {
+            closeStack();
+            state = State::Configured;
         }
     }
 }
 
 void VirtualCockpit::engineTick()
 {
+    if(state == State::Connected)
+    {
+        if(duration_cast<milliseconds>(
+            steady_clock::now() - lastFrameTime) > CAN_TIMEOUT)
+        {
+            logger.log("CAN timeout -> reconnect");
+            state = State::Reconnecting;
+        }
+    }
+
+    if(state == State::Reconnecting)
+    {
+        closeStack();
+
+        std::this_thread::sleep_for(milliseconds(200));
+
+        if(openStack())
+        {
+            reconnectAttempts = 0;
+            state = State::Connected;
+        }
+        else
+        {
+            reconnectAttempts++;
+            if(reconnectAttempts > 5)
+                setError("Reconnect failed");
+        }
+        return;
+    }
+
     if(state != State::Connected)
         return;
 
     Frame f;
-
-    // 1️⃣ Przetwarzamy wszystkie ramki
     while(frameQueue && frameQueue->tryPop(f))
     {
+        lastFrameTime = steady_clock::now();
         dispatcher->dispatch(f.id, f.data, f.len);
     }
 
-    // 2️⃣ Dajemy ISO-TP kilka cykli (ważne!)
     if(isotp)
-    {
-        for(int i = 0; i < 3; ++i)
-            isotp->update();
-    }
+        for(int i=0;i<3;i++) isotp->update();
 
-    // 3️⃣ Dopiero teraz warstwa UDS
     if(udsCore)
         udsCore->update();
 
-    // 4️⃣ Na końcu ECU logic
     if(sac)
     {
         sac->update();
 
         if(sac->isReady())
         {
-            std::cout << "\n=== SAC IDENTIFICATION ===\n";
-            std::cout << "VIN: " << sac->getVIN() << "\n";
-            std::cout << "SW : " << sac->getSW()  << "\n";
-            std::cout << "HW : " << sac->getHW()  << "\n";
-            std::cout << "==========================\n";
-
+            auto vin = sac->getVIN();
+            if(vin.size() == 17)
+            {
+                std::lock_guard<std::mutex> lock(runtimeMutex);
+                runtime.vin = vin;
+                runtime.sw = sac->getSW();
+                runtime.hw = sac->getHW();
+                runtime.ecuReady = true;
+            }
             sac.reset();
         }
 
-        if(sac && sac->hasError())
+        if(sac->hasError())
         {
-            std::cout << "SAC identification ERROR\n";
+            setError("SAC identification failed");
             sac.reset();
         }
     }
 }
-
 // ========================
-// Stack Control
+// STACK CONTROL
 // ========================
 
 bool VirtualCockpit::openStack()
@@ -208,12 +223,14 @@ bool VirtualCockpit::openStack()
     udsCore = std::make_unique<UDS_Core>(*isotp);
 
     dispatcher->registerHandler(isotp.get());
-    // ===== ECU Module =====
-    if (selectedECU == "SAC")
+
+    if(selectedECU == "SAC")
     {
         sac = std::make_unique<SAC_Module>(*udsCore);
         sac->startIdentification();
     }
+
+    lastFrameTime = std::chrono::steady_clock::now();
 
     rxThread = std::thread(&VirtualCockpit::rxLoop, this);
 
@@ -221,22 +238,21 @@ bool VirtualCockpit::openStack()
 }
 
 void VirtualCockpit::closeStack()
-{   
+{
     sac.reset();
-    
-    if(transport)
-    {
-        transport->close();
-    }
-
-    if(rxThread.joinable())
-        rxThread.join();
-
     udsCore.reset();
     isotp.reset();
     dispatcher.reset();
     frameQueue.reset();
-    transport.reset();
+
+    if(transport)
+    {
+        transport->close();
+        transport.reset();
+    }
+
+    if(rxThread.joinable())
+        rxThread.join();
 }
 
 void VirtualCockpit::rxLoop()
@@ -247,22 +263,15 @@ void VirtualCockpit::rxLoop()
         uint8_t data[8];
         uint8_t len;
 
-        if(transport->receiveFrame(id, data, len))
+        if(transport && transport->receiveFrame(id, data, len))
         {
             Frame f{};
             f.id = id;
             f.len = len;
             std::memcpy(f.data, data, len);
 
-            frameQueue->push(f);
+            if(frameQueue)
+                frameQueue->push(f);
         }
     }
-}
-
-// ========================
-
-void VirtualCockpit::pushCommand(CommandType type)
-{
-    std::lock_guard<std::mutex> lock(queueMutex);
-    commandQueue.push({type});
 }

@@ -1,52 +1,30 @@
-#include "virtual_cockpit/VirtualCockpit.h"
-#include <iostream>
-#include <thread>
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
+#include <QQmlEngine>
 
-int main()
+#include "src/QML/LanguageSettings.h"
+
+int main(int argc, char *argv[])
 {
-    VirtualCockpit cockpit;
+    QGuiApplication app(argc, argv);
 
-    cockpit.start();
+    QQmlApplicationEngine engine;
 
-    if(!cockpit.configureCAN("can0", 500000))
-    {
-        std::cout << "CAN configuration failed\n";
-        return 1;
-    }
+    static LanguageSettings languageSettings;
+    languageSettings.load();
 
-    if(!cockpit.selectECU("SAC"))
-    {
-        std::cout << "ECU selection failed\n";
-        return 1;
-    }
+    // 🔴 rejestracja w module ecu_gui
+    qmlRegisterSingletonInstance(
+        "ecu_gui",   // URI z CMake
+        1, 0,
+        "LanguageSettings",
+        &languageSettings
+    );
 
-    cockpit.connect();
+    engine.loadFromModule("ecu_gui", "Main");
 
-    // Czekamy aż silnik przejdzie w Connected albo Error
-    while(true)
-    {
-        auto state = cockpit.getState();
+    if (engine.rootObjects().isEmpty())
+        return -1;
 
-        if(state == VirtualCockpit::State::Connected)
-        {
-            std::cout << "Connected to ECU\n";
-            break;
-        }
-
-        if(state == VirtualCockpit::State::Error)
-        {
-            std::cout << "Connection failed\n";
-            cockpit.stop();
-            return 1;
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    }
-
-    std::cout << "Press ENTER to exit\n";
-    std::cin.get();
-
-    cockpit.stop();
-
-    return 0;
+    return app.exec();
 }
