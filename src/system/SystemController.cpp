@@ -1,10 +1,21 @@
 #include "SystemController.h"
+
 #include <QProcess>
+#include <QNetworkInterface>
+#include <QAbstractSocket>
+
+// =====================================================
+// Konstruktor
+// =====================================================
 
 SystemController::SystemController(QObject* parent)
     : QObject(parent)
 {
 }
+
+// =====================================================
+// Helper
+// =====================================================
 
 bool SystemController::runCommand(const QString& program,
                                   const QStringList& args,
@@ -12,7 +23,9 @@ bool SystemController::runCommand(const QString& program,
 {
     QProcess process;
     process.start(program, args);
-    process.waitForFinished();
+
+    if (!process.waitForFinished(5000))
+        return false;
 
     if (output)
         *output = QString::fromUtf8(process.readAllStandardOutput());
@@ -21,9 +34,9 @@ bool SystemController::runCommand(const QString& program,
            process.exitCode() == 0;
 }
 
-// =========================
+// =====================================================
 // CAN
-// =========================
+// =====================================================
 
 bool SystemController::configureCAN(const QString& iface, int bitrate)
 {
@@ -46,9 +59,9 @@ bool SystemController::configureCAN(const QString& iface, int bitrate)
     return ok;
 }
 
-// =========================
+// =====================================================
 // POWER
-// =========================
+// =====================================================
 
 bool SystemController::shutdown()
 {
@@ -60,31 +73,64 @@ bool SystemController::reboot()
     return runCommand("sudo", {"reboot"});
 }
 
-// =========================
-// WIFI BASIC
-// =========================
+// =====================================================
+// WIFI BASIC (sterowanie)
+// =====================================================
 
 bool SystemController::setWifiEnabled(bool enabled)
 {
-    if (enabled)
-        return runCommand("sudo", {"nmcli", "radio", "wifi", "on"});
-    else
-        return runCommand("sudo", {"nmcli", "radio", "wifi", "off"});
+    return runCommand("sudo",
+                      {"nmcli", "radio", "wifi",
+                       enabled ? "on" : "off"});
 }
+
+// =====================================================
+// WIFI STATUS (stabilne, bez nmcli)
+// =====================================================
 
 QString SystemController::wifiStatus()
 {
-    QString output;
-    runCommand("nmcli",
-               {"-t", "-f", "WIFI", "general"},
-               &output);
+    const QList<QNetworkInterface> interfaces =
+        QNetworkInterface::allInterfaces();
 
-    return output.trimmed().toLower(); // enabled / disabled
+    for (const QNetworkInterface &iface : interfaces)
+    {
+        if (iface.name() == "wlan0")
+        {
+            bool isUp =
+                iface.flags().testFlag(QNetworkInterface::IsUp) &&
+                iface.flags().testFlag(QNetworkInterface::IsRunning);
+
+            if (!isUp)
+                return "disconnected";
+
+            const auto entries = iface.addressEntries();
+
+            for (const auto &entry : entries)
+            {
+                if (entry.ip().protocol() ==
+                    QAbstractSocket::IPv4Protocol)
+                {
+                    return "connected";
+                }
+            }
+
+            // interfejs działa, ale brak IP
+            return "connecting";
+        }
+    }
+
+    return "unavailable";
 }
 
-// =========================
+bool SystemController::isWifiConnected()
+{
+    return wifiStatus() == "connected";
+}
+
+// =====================================================
 // WIFI ADVANCED
-// =========================
+// =====================================================
 
 QStringList SystemController::wifiScan()
 {
@@ -128,5 +174,5 @@ bool SystemController::wifiConnect(const QString& ssid,
 bool SystemController::wifiDisconnect()
 {
     return runCommand("sudo",
-                      {"nmcli", "networking", "off"});
+                      {"nmcli", "radio", "wifi", "off"});
 }

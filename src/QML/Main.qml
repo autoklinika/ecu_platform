@@ -7,11 +7,12 @@ ApplicationWindow {
     width: 1280
     height: 720
     visible: true
-    visibility: Window.FullScreen
+    //visibility: Window.FullScreen
     flags: Qt.FramelessWindowHint
     title: "ECU Tester"
 
     Theme { id: theme }
+
     property string wifiState: "unknown"
 
     background: Rectangle {
@@ -20,24 +21,31 @@ ApplicationWindow {
 
     property date currentDateTime: new Date()
 
+    // =============================
+    // ZEGAR
+    // =============================
     Timer {
         interval: 1000
         running: true
         repeat: true
         onTriggered: currentDateTime = new Date()
-       }
-    Timer {
-    interval: 3000
-    running: true
-    repeat: true
-    onTriggered: {
-        wifiState = SystemController.wifiStatus()
-       
     }
-}
 
+    // =============================
+    // WIFI POLLING
+    // =============================
+    Timer {
+        interval: 3000
+        running: true
+        repeat: true
+        onTriggered: {
+            wifiState = SystemController.wifiStatus()
+        }
+    }
 
-    // 📅 DATA
+    // =============================
+    // DATA
+    // =============================
     Text {
         visible: stack.depth === 1
         anchors.left: parent.left
@@ -50,7 +58,9 @@ ApplicationWindow {
         color: "#444444"
     }
 
-    // 🏷 NAZWA
+    // =============================
+    // TYTUŁ
+    // =============================
     Text {
         visible: stack.depth === 1
         anchors.horizontalCenter: parent.horizontalCenter
@@ -61,37 +71,99 @@ ApplicationWindow {
         font.bold: true
         color: "#2A2A2A"
     }
-  Item {
+
+    // =============================
+    // WIFI IKONA
+    // =============================
+    Item {
+    id: wifiIcon
     visible: stack.depth === 1
+
     anchors.right: parent.right
     anchors.top: parent.top
     anchors.rightMargin: 140
-    anchors.topMargin: 18
-    width: 28
-    height: 18
-    clip: false
+    anchors.topMargin: 10
 
-    property color activeColor: '#d41717'
-    property color inactiveColor: '#23c936'
+    width: 40
+    height: 30
 
-    Repeater {
-        model: 4
-        Rectangle {
-            width: 4
-            height: (index + 1) * 4
-            radius: 1
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.leftMargin: index * 6
+    property string wifiState: SystemController.wifiStatus()
 
-            color: wifiState === "enabled"
-                  ? parent.activeColor
-                  : parent.inactiveColor
+    // polling
+    Timer {
+        interval: 3000
+        running: true
+        repeat: true
+        onTriggered: wifiIcon.wifiState =
+                         SystemController.wifiStatus()
+    }
+
+    property color iconColor: {
+        if (wifiState === "connected")
+            return "#23c936"
+        if (wifiState === "connecting")
+            return "#ffb300"
+        return "#d41717"
+    }
+
+    // 🔥 animacja TYLKO gdy connecting
+    SequentialAnimation on opacity {
+        running: wifiIcon.wifiState === "connecting"
+        loops: Animation.Infinite
+
+        NumberAnimation {
+            from: 1.0
+            to: 0.4
+            duration: 600
+            easing.type: Easing.InOutQuad
+        }
+        NumberAnimation {
+            from: 0.4
+            to: 1.0
+            duration: 600
+            easing.type: Easing.InOutQuad
         }
     }
+
+    Canvas {
+        id: canvas
+        anchors.fill: parent
+
+        onPaint: {
+            var ctx = getContext("2d")
+            ctx.clearRect(0, 0, width, height)
+
+            ctx.strokeStyle = wifiIcon.iconColor
+            ctx.fillStyle = wifiIcon.iconColor
+            ctx.lineWidth = 3
+
+            var centerX = width / 2
+            var bottomY = height - 2
+
+            ctx.beginPath()
+            ctx.arc(centerX, bottomY, 14, Math.PI, 2 * Math.PI)
+            ctx.stroke()
+
+            ctx.beginPath()
+            ctx.arc(centerX, bottomY, 9, Math.PI, 2 * Math.PI)
+            ctx.stroke()
+
+            ctx.beginPath()
+            ctx.arc(centerX, bottomY, 4, Math.PI, 2 * Math.PI)
+            ctx.stroke()
+
+            ctx.beginPath()
+            ctx.arc(centerX, bottomY, 2, 0, 2 * Math.PI)
+            ctx.fill()
+        }
+    }
+
+    onIconColorChanged: canvas.requestPaint()
 }
 
-    // 🕒 GODZINA
+    // =============================
+    // GODZINA
+    // =============================
     Text {
         visible: stack.depth === 1
         anchors.right: parent.right
@@ -104,6 +176,9 @@ ApplicationWindow {
         color: "#444444"
     }
 
+    // =============================
+    // STACK
+    // =============================
     StackView {
         id: stack
         anchors.fill: parent
@@ -113,14 +188,17 @@ ApplicationWindow {
 
     Component.onCompleted: {
         Navigation.stack = stack
+        wifiState = SystemController.wifiStatus()
     }
-    Rectangle {
-    width: 80
-    height: 80
-    anchors.left: parent.left
-    anchors.bottom: parent.bottom
-    color: "transparent"
-    z: 9999
 
-}
+    // DEBUG (możesz usunąć po testach)
+    /*
+    Text {
+        anchors.centerIn: parent
+        text: wifiState
+        font.pixelSize: 40
+        color: "red"
+        z: 9999
+    }
+    */
 }

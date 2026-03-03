@@ -21,6 +21,7 @@ public:
     // WiFi basic
     Q_INVOKABLE bool setWifiEnabled(bool enabled);
     Q_INVOKABLE QString wifiStatus();
+    Q_INVOKABLE bool isWifiConnected();     // 🔥 NOWE
 
     // WiFi advanced
     Q_INVOKABLE QStringList wifiScan();

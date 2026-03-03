@@ -5,19 +5,28 @@
 #include "src/QML/LanguageSettings.h"
 #include "system/SystemController.h"
 
-
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
 
+    // ===== SystemController =====
+    static SystemController systemController;
+
+    qmlRegisterSingletonInstance(
+        "ecu_gui",
+        1, 0,
+        "SystemController",
+        &systemController
+    );
+
+    // ===== LanguageSettings =====
     static LanguageSettings languageSettings;
     languageSettings.load();
 
-    // 🔴 rejestracja w module ecu_gui
     qmlRegisterSingletonInstance(
-        "ecu_gui",   // URI z CMake
+        "ecu_gui",
         1, 0,
         "LanguageSettings",
         &languageSettings
