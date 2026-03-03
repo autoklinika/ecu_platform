@@ -3,6 +3,8 @@
 #include <QQmlEngine>
 
 #include "src/QML/LanguageSettings.h"
+#include "system/SystemController.h"
+
 
 int main(int argc, char *argv[])
 {

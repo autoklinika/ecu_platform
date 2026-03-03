@@ -972,6 +972,30 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/system/SystemController.o: src/system/SystemController.cpp.o
+.PHONY : src/system/SystemController.o
+
+# target to build an object file
+src/system/SystemController.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/src/system/SystemController.cpp.o
+.PHONY : src/system/SystemController.cpp.o
+
+src/system/SystemController.i: src/system/SystemController.cpp.i
+.PHONY : src/system/SystemController.i
+
+# target to preprocess a source file
+src/system/SystemController.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/src/system/SystemController.cpp.i
+.PHONY : src/system/SystemController.cpp.i
+
+src/system/SystemController.s: src/system/SystemController.cpp.s
+.PHONY : src/system/SystemController.s
+
+# target to generate assembly for a file
+src/system/SystemController.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/src/system/SystemController.cpp.s
+.PHONY : src/system/SystemController.cpp.s
+
 src/transport/Transport_CAN_Linux.o: src/transport/Transport_CAN_Linux.cpp.o
 .PHONY : src/transport/Transport_CAN_Linux.o
 
@@ -1173,6 +1197,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/system/SystemController.o"
+	@echo "... src/system/SystemController.i"
+	@echo "... src/system/SystemController.s"
 	@echo "... src/transport/Transport_CAN_Linux.o"
 	@echo "... src/transport/Transport_CAN_Linux.i"
 	@echo "... src/transport/Transport_CAN_Linux.s"

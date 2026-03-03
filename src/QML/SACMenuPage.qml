@@ -156,7 +156,7 @@ Item {
 
                 onClicked: {
                     root.modalOpen = false
-                    Navigation.push("SACSpeedPage.qml")
+                    Navigation.push("MainMenu.qml")
                 }
             }
         }

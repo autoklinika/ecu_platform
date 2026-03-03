@@ -35,6 +35,9 @@ qt_add_executable(ecu_app
     # ---- QT BRIDGE ----
     src/QT_Bridge/CockpitController.cpp
     src/QML/LanguageSettings.cpp
+
+    #-----SYSTEM------
+    src/system/SystemController.cpp
 )
 
 target_include_directories(ecu_app PRIVATE

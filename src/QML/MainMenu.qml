@@ -49,4 +49,15 @@ Item {
         y: startY + btnH + gapY
         onClicked: Navigation.push("InfoPage.qml")
     }
+     StyledButton {
+        text: "\u23FB"
+        width: 150
+        height: 80
+
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 20
+
+        onClicked: Qt.quit()
+    }
 }

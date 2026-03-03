@@ -7,9 +7,12 @@ ApplicationWindow {
     width: 1280
     height: 720
     visible: true
+    visibility: Window.FullScreen
+    flags: Qt.FramelessWindowHint
     title: "ECU Tester"
 
     Theme { id: theme }
+    property string wifiState: "unknown"
 
     background: Rectangle {
         color: theme.bgColor
@@ -22,7 +25,17 @@ ApplicationWindow {
         running: true
         repeat: true
         onTriggered: currentDateTime = new Date()
+       }
+    Timer {
+    interval: 3000
+    running: true
+    repeat: true
+    onTriggered: {
+        wifiState = SystemController.wifiStatus()
+       
     }
+}
+
 
     // 📅 DATA
     Text {
@@ -48,6 +61,35 @@ ApplicationWindow {
         font.bold: true
         color: "#2A2A2A"
     }
+  Item {
+    visible: stack.depth === 1
+    anchors.right: parent.right
+    anchors.top: parent.top
+    anchors.rightMargin: 140
+    anchors.topMargin: 18
+    width: 28
+    height: 18
+    clip: false
+
+    property color activeColor: '#d41717'
+    property color inactiveColor: '#23c936'
+
+    Repeater {
+        model: 4
+        Rectangle {
+            width: 4
+            height: (index + 1) * 4
+            radius: 1
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.leftMargin: index * 6
+
+            color: wifiState === "enabled"
+                  ? parent.activeColor
+                  : parent.inactiveColor
+        }
+    }
+}
 
     // 🕒 GODZINA
     Text {
@@ -80,11 +122,5 @@ ApplicationWindow {
     color: "transparent"
     z: 9999
 
-    MouseArea {
-        anchors.fill: parent
-        onPressAndHold: {
-            root.visibility = Window.Windowed
-        }
-    }
 }
 }
