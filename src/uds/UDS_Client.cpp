@@ -43,26 +43,6 @@ UDS_Client::sendRequest(const std::vector<uint8_t>& request,
     return std::nullopt;
 }
 
-bool UDS_Client::waitForPositiveResponse(uint8_t expectedSid,
-                                         std::vector<uint8_t>& response,
-                                         milliseconds timeout)
-{
-    auto resp = sendRequest(response, timeout);
-    if(!resp)
-        return false;
-
-    if(resp->size() < 1)
-        return false;
-
-    if((*resp)[0] == (expectedSid + 0x40))
-    {
-        response = *resp;
-        return true;
-    }
-
-    return false;
-}
-
 bool UDS_Client::startExtendedSession()
 {
     std::vector<uint8_t> req = {0x10, 0x03};

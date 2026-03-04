@@ -4,6 +4,15 @@
 #include <QNetworkInterface>
 #include <QAbstractSocket>
 
+namespace {
+
+bool isWirelessInterfaceName(const QString& name)
+{
+    return name.startsWith("wl") || name.startsWith("wlan");
+}
+
+}
+
 // =====================================================
 // Konstruktor
 // =====================================================
@@ -93,10 +102,14 @@ QString SystemController::wifiStatus()
     const QList<QNetworkInterface> interfaces =
         QNetworkInterface::allInterfaces();
 
+    bool wifiDetected = false;
+
     for (const QNetworkInterface &iface : interfaces)
     {
-        if (iface.name() == "wlan0")
+        if (isWirelessInterfaceName(iface.name()))
         {
+            wifiDetected = true;
+
             bool isUp =
                 iface.flags().testFlag(QNetworkInterface::IsUp) &&
                 iface.flags().testFlag(QNetworkInterface::IsRunning);
@@ -120,7 +133,7 @@ QString SystemController::wifiStatus()
         }
     }
 
-    return "unavailable";
+    return wifiDetected ? "disconnected" : "unavailable";
 }
 
 bool SystemController::isWifiConnected()
