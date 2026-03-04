@@ -37,7 +37,7 @@ Item {
 
         // MENU button
         StyledButton {
-            text: "MENU"
+            text: LanguageManager.t("kafelek_menu")
             width: 192
             height: 64
             x: 16
@@ -113,7 +113,7 @@ Item {
     // =========================
 
     StyledButton {
-        text: "< PREV"
+        text: LanguageManager.t("kafelek_prev")
         width: 192
         height: 80
         x: 320
@@ -121,7 +121,7 @@ Item {
     }
 
     StyledButton {
-        text: "NEXT >"
+        text: LanguageManager.t("kafelek_next")
         width: 192
         height: 80
         x: 768
@@ -147,7 +147,7 @@ Item {
             anchors.centerIn: parent
             spacing: 24
 
-            StyledButton { text: "DTC"; width: 280; height: 68 }
+            StyledButton { text: LanguageManager.t("kafelek_dtc"); width: 280; height: 68 }
             StyledButton { text: LanguageManager.t("kafelek_activ"); width: 280; height: 68 }
             StyledButton {
                 text: LanguageManager.t("kafelek_back")

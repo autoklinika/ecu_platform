@@ -18,7 +18,7 @@ Item {
         height: btnH
         x: startX
         y: startY
-        text: "250 kbps"
+        text: LanguageManager.t("kafelek_can_250")
 
         onClicked: {
             // docelowo: start CAN 250
@@ -32,7 +32,7 @@ Item {
         height: btnH
         x: startX + btnW + gapX
         y: startY
-        text: "500 kbps"
+        text: LanguageManager.t("kafelek_can_500")
 
         onClicked: {
             // docelowo: start CAN 500

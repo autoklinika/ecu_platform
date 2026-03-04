@@ -46,7 +46,7 @@ Item {
         StyledButton {
             width: 240
             height: 90
-            text: "OK"
+            text: LanguageManager.t("kafelek_ok")
             onClicked: Navigation.push("SACMenuPage.qml")
         }
     }
