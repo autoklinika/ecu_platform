@@ -49,6 +49,7 @@ target_include_directories(ecu_app PRIVATE
 # ==========================
 
 file(GLOB_RECURSE QML_FILES
+    CONFIGURE_DEPENDS
     RELATIVE ${CMAKE_SOURCE_DIR}
     src/QML/*.qml
 )

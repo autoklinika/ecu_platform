@@ -21,7 +21,7 @@ Item {
             width: 420
             height: 120
             text: LanguageManager.t("settings_language")
-            onClicked: Navigation.push("LanguagePage.qml")
+            onClicked: Navigation.push(Qt.resolvedUrl("LanguagePage.qml"))
         }
 
         StyledButton {
