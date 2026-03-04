@@ -5,8 +5,8 @@ import ecu_gui 1.0
 Item {
 
     property string vin: "YS2R4X20005399401"
-    property string sw:  "SW_2.14.07"
-    property string hw:  "HW_1.02"
+    property string sw: "SW_2.14.07"
+    property string hw: "HW_1.02"
 
     Column {
         anchors.centerIn: parent
