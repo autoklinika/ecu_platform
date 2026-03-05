@@ -5,6 +5,7 @@ import ecu_gui 1.0
 Item {
 
     property int speed: 250
+    property string canInterface: "can0"
     property bool connectionError: false
     property bool started: false
 
@@ -54,7 +55,8 @@ Item {
 
         onTriggered: {
             if (!started) {
-                CockpitController.start("can0", speed * 1000)
+                SystemController.configureCAN(canInterface, speed * 1000)
+                CockpitController.start(canInterface, speed * 1000)
                 started = true
             }
 
