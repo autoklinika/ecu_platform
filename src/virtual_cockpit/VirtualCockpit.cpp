@@ -194,8 +194,7 @@ void VirtualCockpit::engineTick()
             }
             sac.reset();
         }
-
-        if(sac->hasError())
+        else if(sac->hasError())
         {
             setError("SAC identification failed");
             sac.reset();
