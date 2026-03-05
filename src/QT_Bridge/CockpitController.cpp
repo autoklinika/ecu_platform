@@ -13,6 +13,9 @@ CockpitController::CockpitController(QObject* parent)
 
 void CockpitController::start(QString iface, int bitrate)
 {
+    m_ecuReady = false;
+    emit ecuReadyChanged();
+
     engine.configureCAN(iface.toStdString(), bitrate);
     engine.selectECU("SAC");
     engine.connect();
@@ -62,5 +65,11 @@ void CockpitController::poll()
     {
         m_error = err;
         emit errorChanged();
+    }
+
+    if(data.ecuReady != m_ecuReady)
+    {
+        m_ecuReady = data.ecuReady;
+        emit ecuReadyChanged();
     }
 }

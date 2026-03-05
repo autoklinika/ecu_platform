@@ -3,6 +3,7 @@
 #include <QQmlEngine>
 
 #include "src/QML/LanguageSettings.h"
+#include "QT_Bridge/CockpitController.h"
 #include "system/SystemController.h"
 
 int main(int argc, char *argv[])
@@ -30,6 +31,16 @@ int main(int argc, char *argv[])
         1, 0,
         "LanguageSettings",
         &languageSettings
+    );
+
+    // ===== CockpitController =====
+    static CockpitController cockpitController;
+
+    qmlRegisterSingletonInstance(
+        "ecu_gui",
+        1, 0,
+        "CockpitController",
+        &cockpitController
     );
 
     engine.loadFromModule("ecu_gui", "Main");

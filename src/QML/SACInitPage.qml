@@ -6,6 +6,7 @@ Item {
 
     property int speed: 250
     property bool connectionError: false
+    property bool started: false
 
     Column {
         anchors.centerIn: parent
@@ -36,15 +37,41 @@ Item {
             color: "red"
             font.pixelSize: 22
         }
+
+        StyledButton {
+            visible: connectionError
+            width: 240
+            height: 90
+            text: LanguageManager.t("kafelek_back")
+            onClicked: Navigation.pop()
+        }
     }
 
     Timer {
-        interval: 2000
+        interval: 150
         running: true
-        repeat: false
+        repeat: true
+
         onTriggered: {
-            if (!connectionError)
-                Navigation.push("SACMainPage.qml")
+            if (!started) {
+                CockpitController.start("can0", speed * 1000)
+                started = true
+            }
+
+            if (CockpitController.ecuReady) {
+                Navigation.push("SACMainPage.qml", {
+                    vin: CockpitController.vin,
+                    sw: CockpitController.sw,
+                    hw: CockpitController.hw
+                })
+                running = false
+                return
+            }
+
+            if (CockpitController.error.length > 0) {
+                connectionError = true
+                running = false
+            }
         }
     }
 }
