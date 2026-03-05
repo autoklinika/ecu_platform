@@ -19,6 +19,7 @@ public:
 
     Q_INVOKABLE void start(QString iface, int bitrate);
     Q_INVOKABLE void disconnect();
+    Q_INVOKABLE QString readVIN() const;
 
     QString vin() const { return m_vin; }
     QString sw() const { return m_sw; }

@@ -26,6 +26,11 @@ void CockpitController::disconnect()
     engine.disconnect();
 }
 
+QString CockpitController::readVIN() const
+{
+    return m_vin;
+}
+
 void CockpitController::poll()
 {
     auto data = engine.getRuntime();
