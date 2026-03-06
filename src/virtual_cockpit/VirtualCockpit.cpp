@@ -96,6 +96,15 @@ void VirtualCockpit::engineLoop()
 
 void VirtualCockpit::processCommands()
 {
+    auto resetRuntime = [this]() {
+        std::lock_guard<std::mutex> lock(runtimeMutex);
+        runtime.vin.clear();
+        runtime.sw.clear();
+        runtime.hw.clear();
+        runtime.lastError.clear();
+        runtime.ecuReady = false;
+    };
+
     std::queue<Command> local;
     {
         std::lock_guard<std::mutex> lock(queueMutex);
@@ -114,6 +123,7 @@ void VirtualCockpit::processCommands()
         else if(cmd.type == CommandType::Connect &&
                 state == State::Configured)
         {
+            resetRuntime();
             state = State::Connecting;
 
             if(openStack())
@@ -124,6 +134,7 @@ void VirtualCockpit::processCommands()
         else if(cmd.type == CommandType::Disconnect)
         {
             closeStack();
+            resetRuntime();
             state = State::Configured;
         }
     }
