@@ -238,12 +238,6 @@ bool VirtualCockpit::openStack()
 
 void VirtualCockpit::closeStack()
 {
-    sac.reset();
-    udsCore.reset();
-    isotp.reset();
-    dispatcher.reset();
-    frameQueue.reset();
-
     if(transport)
     {
         transport->close();
@@ -252,6 +246,12 @@ void VirtualCockpit::closeStack()
 
     if(rxThread.joinable())
         rxThread.join();
+
+    sac.reset();
+    udsCore.reset();
+    isotp.reset();
+    dispatcher.reset();
+    frameQueue.reset();
 }
 
 void VirtualCockpit::rxLoop()
