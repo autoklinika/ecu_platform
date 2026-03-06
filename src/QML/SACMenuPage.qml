@@ -156,6 +156,8 @@ Item {
 
                 onClicked: {
                     root.modalOpen = false
+                    CockpitController.disconnect()
+                    SystemController.resetCAN("can0")
                     Navigation.push("MainMenu.qml")
                 }
             }

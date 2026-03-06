@@ -47,6 +47,10 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 40
-        onClicked: Navigation.pop()
+        onClicked: {
+            CockpitController.disconnect()
+            SystemController.resetCAN("can0")
+            Navigation.pop()
+        }
     }
 }

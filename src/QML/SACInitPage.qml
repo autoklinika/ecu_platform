@@ -44,7 +44,11 @@ Item {
             width: 240
             height: 90
             text: LanguageManager.t("kafelek_back")
-            onClicked: Navigation.pop()
+            onClicked: {
+                CockpitController.disconnect()
+                SystemController.resetCAN(canInterface)
+                Navigation.pop()
+            }
         }
     }
 

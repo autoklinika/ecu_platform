@@ -68,6 +68,22 @@ bool SystemController::configureCAN(const QString& iface, int bitrate)
     return ok;
 }
 
+bool SystemController::resetCAN(const QString& iface)
+{
+    if (iface.isEmpty())
+        return false;
+
+    bool ok = true;
+
+    ok &= runCommand("sudo",
+                     {"ip", "link", "set", iface, "down"});
+
+    ok &= runCommand("sudo",
+                     {"ip", "link", "set", iface, "up"});
+
+    return ok;
+}
+
 // =====================================================
 // POWER
 // =====================================================

@@ -13,6 +13,7 @@ public:
 
     // CAN
     Q_INVOKABLE bool configureCAN(const QString& iface, int bitrate);
+    Q_INVOKABLE bool resetCAN(const QString& iface);
 
     // Power
     Q_INVOKABLE bool shutdown();
