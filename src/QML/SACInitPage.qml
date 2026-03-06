@@ -6,8 +6,10 @@ Item {
 
     property int speed: 250
     property string canInterface: "can0"
+    property int connectTimeoutMs: 5000
     property bool connectionError: false
     property bool started: false
+    property int elapsedMs: 0
 
     Column {
         anchors.centerIn: parent
@@ -60,9 +62,11 @@ Item {
         onTriggered: {
             if (!started) {
                 SystemController.configureCAN(canInterface, speed * 1000)
-                CockpitController.start(canInterface, speed * 1000)
-                started = true
+                if (CockpitController.start(canInterface, speed * 1000))
+                    started = true
             }
+
+            elapsedMs += interval
 
             if (CockpitController.ecuReady) {
                 Navigation.push("SACMainPage.qml", {
@@ -74,8 +78,18 @@ Item {
                 return
             }
 
+            if (elapsedMs >= connectTimeoutMs) {
+                connectionError = true
+                CockpitController.disconnect()
+                SystemController.resetCAN(canInterface)
+                running = false
+                return
+            }
+
             if (CockpitController.error.length > 0) {
                 connectionError = true
+                CockpitController.disconnect()
+                SystemController.resetCAN(canInterface)
                 running = false
             }
         }

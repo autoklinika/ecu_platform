@@ -11,14 +11,30 @@ CockpitController::CockpitController(QObject* parent)
     pollTimer.start(50);
 }
 
-void CockpitController::start(QString iface, int bitrate)
+bool CockpitController::start(QString iface, int bitrate)
 {
+    engine.disconnect();
+
     m_ecuReady = false;
     emit ecuReadyChanged();
 
-    engine.configureCAN(iface.toStdString(), bitrate);
+    m_error.clear();
+    emit errorChanged();
+
+    m_vin.clear();
+    m_sw.clear();
+    m_hw.clear();
+    emit vinChanged();
+    emit swChanged();
+    emit hwChanged();
+
+    if(!engine.configureCAN(iface.toStdString(), bitrate))
+        return false;
+
     engine.selectECU("SAC");
     engine.connect();
+
+    return true;
 }
 
 void CockpitController::disconnect()

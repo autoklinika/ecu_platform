@@ -17,7 +17,7 @@ class CockpitController : public QObject
 public:
     explicit CockpitController(QObject* parent=nullptr);
 
-    Q_INVOKABLE void start(QString iface, int bitrate);
+    Q_INVOKABLE bool start(QString iface, int bitrate);
     Q_INVOKABLE void disconnect();
     Q_INVOKABLE QString readVIN() const;
 
