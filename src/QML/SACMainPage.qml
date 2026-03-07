@@ -5,10 +5,10 @@ import ecu_gui 1.0
 Item {
     id: root
 
-    // Values can be provided from Navigation.push(..., { vin, sw, hw })
-    property string vin: CockpitController.vin.length > 0 ? CockpitController.vin : "---"
-    property string sw: CockpitController.sw.length > 0 ? CockpitController.sw : "---"
-    property string hw: CockpitController.hw.length > 0 ? CockpitController.hw : "---"
+    // Values provided from Navigation.push(..., { vin, sw, hw })
+    property string vin: "---"
+    property string sw: "---"
+    property string hw: "---"
 
     Column {
         anchors.centerIn: parent

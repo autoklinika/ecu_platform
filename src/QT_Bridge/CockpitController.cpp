@@ -41,11 +41,6 @@ CockpitController::CockpitController(QObject* parent)
 
 bool CockpitController::start(QString iface, int bitrate)
 {
-    engine.disconnect();
-
-    if(!waitUntilCanConfigurable(engine, std::chrono::milliseconds(1200)))
-        return false;
-
     m_ecuReady = false;
     emit ecuReadyChanged();
 
@@ -59,6 +54,11 @@ bool CockpitController::start(QString iface, int bitrate)
     emit swChanged();
     emit hwChanged();
 
+    engine.disconnect();
+
+    if(!waitUntilCanConfigurable(engine, std::chrono::milliseconds(1200)))
+        return false;
+
     if(!engine.configureCAN(iface.toStdString(), bitrate))
         return false;
 
@@ -71,6 +71,19 @@ bool CockpitController::start(QString iface, int bitrate)
 void CockpitController::disconnect()
 {
     engine.disconnect();
+
+    m_ecuReady = false;
+    emit ecuReadyChanged();
+
+    m_error.clear();
+    emit errorChanged();
+
+    m_vin.clear();
+    m_sw.clear();
+    m_hw.clear();
+    emit vinChanged();
+    emit swChanged();
+    emit hwChanged();
 }
 
 QString CockpitController::readVIN() const
