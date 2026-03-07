@@ -3,6 +3,7 @@
 #include <QProcess>
 #include <QNetworkInterface>
 #include <QAbstractSocket>
+#include <QThread>
 
 namespace {
 
@@ -10,6 +11,8 @@ bool isWirelessInterfaceName(const QString& name)
 {
     return name.startsWith("wl") || name.startsWith("wlan");
 }
+
+constexpr unsigned long CAN_SWITCH_DELAY_MS = 120;
 
 }
 
@@ -57,10 +60,14 @@ bool SystemController::configureCAN(const QString& iface, int bitrate)
     ok &= runCommand("sudo",
                      {"ip", "link", "set", iface, "down"});
 
+    QThread::msleep(CAN_SWITCH_DELAY_MS);
+
     ok &= runCommand("sudo",
                      {"ip", "link", "set", iface,
                       "type", "can",
                       "bitrate", QString::number(bitrate)});
+
+    QThread::msleep(CAN_SWITCH_DELAY_MS);
 
     ok &= runCommand("sudo",
                      {"ip", "link", "set", iface, "up"});
@@ -73,15 +80,8 @@ bool SystemController::resetCAN(const QString& iface)
     if (iface.isEmpty())
         return false;
 
-    bool ok = true;
-
-    ok &= runCommand("sudo",
-                     {"ip", "link", "set", iface, "down"});
-
-    ok &= runCommand("sudo",
-                     {"ip", "link", "set", iface, "up"});
-
-    return ok;
+    return runCommand("sudo",
+                      {"ip", "link", "set", iface, "down"});
 }
 
 // =====================================================
