@@ -9,6 +9,7 @@ Item {
     property int connectTimeoutMs: 5000
     property bool connectionError: false
     property bool started: false
+    property bool canPrepared: false
     property int elapsedMs: 0
 
     Column {
@@ -61,9 +62,15 @@ Item {
 
         onTriggered: {
             if (!started) {
-                SystemController.configureCAN(canInterface, speed * 1000)
+                if (!canPrepared) {
+                    SystemController.configureCAN(canInterface, speed * 1000)
+                    canPrepared = true
+                }
+
                 if (CockpitController.start(canInterface, speed * 1000))
                     started = true
+
+                return
             }
 
             elapsedMs += interval
@@ -86,7 +93,7 @@ Item {
                 return
             }
 
-            if (CockpitController.error.length > 0) {
+            if (elapsedMs >= 1000 && CockpitController.error.length > 0) {
                 connectionError = true
                 CockpitController.disconnect()
                 SystemController.resetCAN(canInterface)
