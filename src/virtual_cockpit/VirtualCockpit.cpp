@@ -133,9 +133,11 @@ void VirtualCockpit::processCommands()
         }
         else if(cmd.type == CommandType::Disconnect)
         {
+            // Ustaw stan przed closeStack(), żeby rxLoop mógł zakończyć się
+            // zanim dojdziemy do join().
+            state = State::Configured;
             closeStack();
             resetRuntime();
-            state = State::Configured;
         }
     }
 }
