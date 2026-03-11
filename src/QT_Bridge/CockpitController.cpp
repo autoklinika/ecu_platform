@@ -1,33 +1,5 @@
 #include "CockpitController.h"
 
-#include <chrono>
-#include <thread>
-
-namespace {
-
-bool waitUntilCanConfigurable(VirtualCockpit& engine,
-                              std::chrono::milliseconds timeout)
-{
-    const auto start = std::chrono::steady_clock::now();
-
-    while (std::chrono::steady_clock::now() - start < timeout)
-    {
-        const auto st = engine.getState();
-
-        if (st == VirtualCockpit::State::Idle ||
-            st == VirtualCockpit::State::Configured)
-        {
-            return true;
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    }
-
-    return false;
-}
-
-}
-
 CockpitController::CockpitController(QObject* parent)
     : QObject(parent)
 {
@@ -54,10 +26,8 @@ bool CockpitController::start(QString iface, int bitrate)
     emit swChanged();
     emit hwChanged();
 
-    engine.disconnect();
-
-    if(!waitUntilCanConfigurable(engine, std::chrono::milliseconds(1200)))
-        return false;
+    engine.stop();
+    engine.start();
 
     if(!engine.configureCAN(iface.toStdString(), bitrate))
         return false;
