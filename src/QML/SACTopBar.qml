@@ -34,7 +34,7 @@ Item {
         y: 10 * scaleY
         width: 120 * scaleX
         height: 40 * scaleY
-        text: "MENU"
+        text: LanguageManager.t("kafelek_menu")
         onClicked: root.menuClicked()
     }
 

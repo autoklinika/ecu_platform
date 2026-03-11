@@ -7,7 +7,12 @@ QtObject {
     property StackView stack
 
     function push(page, props) {
-        if (stack)
+        if (!stack)
+            return
+
+        if (props === undefined)
+            stack.push(page)
+        else
             stack.push(page, props)
     }
 

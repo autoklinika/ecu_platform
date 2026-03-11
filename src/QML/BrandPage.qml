@@ -24,7 +24,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         y: parent.height * 0.38
 
-        text: "SAC"
+        text: LanguageManager.t("kafelek_sac")
         onClicked: Navigation.push("SACSpeedPage.qml")
     }
 

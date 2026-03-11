@@ -28,6 +28,14 @@ QtObject {
             "language_english": "Angielski",
             "kafelek_activ": "Aktywacje",
             "kafelek_back": "Powrót",
+            "kafelek_sac": "SAC",
+            "kafelek_can_250": "250 kbps",
+            "kafelek_can_500": "500 kbps",
+            "kafelek_ok": "OK",
+            "kafelek_menu": "MENU",
+            "kafelek_prev": "< POPRZEDNIA",
+            "kafelek_next": "NASTĘPNA >",
+            "kafelek_dtc": "DTC",
         },
         "en": {
             "menu_test": "Tests",
@@ -39,6 +47,14 @@ QtObject {
             "language_english": "English",
             "kafelek_activ": "Activation",
             "kafelek_back": "Back",
+            "kafelek_sac": "SAC",
+            "kafelek_can_250": "250 kbps",
+            "kafelek_can_500": "500 kbps",
+            "kafelek_ok": "OK",
+            "kafelek_menu": "MENU",
+            "kafelek_prev": "< PREV",
+            "kafelek_next": "NEXT >",
+            "kafelek_dtc": "DTC",
         }
     }
 

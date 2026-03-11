@@ -9,28 +9,19 @@ Item {
         spacing: 40
 
         Text {
-            text: LanguageManager.t("settings_language")
+            text: LanguageManager.t("menu_settings")
             font.pixelSize: 36
             font.bold: true
             color: "#2A2A2A"
+            horizontalAlignment: Text.AlignHCenter
+            anchors.horizontalCenter: parent.horizontalCenter
         }
 
-        Row {
-            spacing: 40
-
-            StyledButton {
-                width: 300
-                height: 120
-                text: LanguageManager.t("language_polish")
-                onClicked: LanguageManager.setLanguage("pl")
-            }
-
-            StyledButton {
-                width: 300
-                height: 120
-                text: LanguageManager.t("language_english")
-                onClicked: LanguageManager.setLanguage("en")
-            }
+        StyledButton {
+            width: 420
+            height: 120
+            text: LanguageManager.t("settings_language")
+            onClicked: Navigation.push(Qt.resolvedUrl("LanguagePage.qml"))
         }
 
         StyledButton {

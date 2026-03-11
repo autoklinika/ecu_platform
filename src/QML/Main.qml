@@ -13,8 +13,6 @@ ApplicationWindow {
 
     Theme { id: theme }
 
-    property string wifiState: "unknown"
-
     background: Rectangle {
         color: theme.bgColor
     }
@@ -29,18 +27,6 @@ ApplicationWindow {
         running: true
         repeat: true
         onTriggered: currentDateTime = new Date()
-    }
-
-    // =============================
-    // WIFI POLLING
-    // =============================
-    Timer {
-        interval: 3000
-        running: true
-        repeat: true
-        onTriggered: {
-            wifiState = SystemController.wifiStatus()
-        }
     }
 
     // =============================
@@ -188,7 +174,6 @@ ApplicationWindow {
 
     Component.onCompleted: {
         Navigation.stack = stack
-        wifiState = SystemController.wifiStatus()
     }
 
     // DEBUG (możesz usunąć po testach)

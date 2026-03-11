@@ -27,10 +27,6 @@ private:
                 std::chrono::milliseconds timeout =
                     std::chrono::milliseconds(2000));
 
-    bool waitForPositiveResponse(uint8_t expectedSid,
-                                 std::vector<uint8_t>& response,
-                                 std::chrono::milliseconds timeout);
-
 private:
     ISOTP& isotp_;
 };

@@ -96,6 +96,15 @@ void VirtualCockpit::engineLoop()
 
 void VirtualCockpit::processCommands()
 {
+    auto resetRuntime = [this]() {
+        std::lock_guard<std::mutex> lock(runtimeMutex);
+        runtime.vin.clear();
+        runtime.sw.clear();
+        runtime.hw.clear();
+        runtime.lastError.clear();
+        runtime.ecuReady = false;
+    };
+
     std::queue<Command> local;
     {
         std::lock_guard<std::mutex> lock(queueMutex);
@@ -114,6 +123,7 @@ void VirtualCockpit::processCommands()
         else if(cmd.type == CommandType::Connect &&
                 state == State::Configured)
         {
+            resetRuntime();
             state = State::Connecting;
 
             if(openStack())
@@ -123,8 +133,11 @@ void VirtualCockpit::processCommands()
         }
         else if(cmd.type == CommandType::Disconnect)
         {
-            closeStack();
+            // Ustaw stan przed closeStack(), żeby rxLoop mógł zakończyć się
+            // zanim dojdziemy do join().
             state = State::Configured;
+            closeStack();
+            resetRuntime();
         }
     }
 }
@@ -194,8 +207,7 @@ void VirtualCockpit::engineTick()
             }
             sac.reset();
         }
-
-        if(sac->hasError())
+        else if(sac->hasError())
         {
             setError("SAC identification failed");
             sac.reset();
@@ -239,12 +251,6 @@ bool VirtualCockpit::openStack()
 
 void VirtualCockpit::closeStack()
 {
-    sac.reset();
-    udsCore.reset();
-    isotp.reset();
-    dispatcher.reset();
-    frameQueue.reset();
-
     if(transport)
     {
         transport->close();
@@ -253,6 +259,12 @@ void VirtualCockpit::closeStack()
 
     if(rxThread.joinable())
         rxThread.join();
+
+    sac.reset();
+    udsCore.reset();
+    isotp.reset();
+    dispatcher.reset();
+    frameQueue.reset();
 }
 
 void VirtualCockpit::rxLoop()

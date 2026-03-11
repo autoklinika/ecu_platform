@@ -57,6 +57,9 @@ bool Transport_CAN_Linux::sendFrame(uint32_t id,
     if(socketFd < 0)
         return false;
 
+    if(data == nullptr || len > CAN_MAX_DLEN)
+        return false;
+
     struct can_frame frame {};
     frame.can_id  = id | CAN_EFF_FLAG;
     frame.can_dlc = len;
@@ -72,6 +75,9 @@ bool Transport_CAN_Linux::receiveFrame(uint32_t& id,
     if(socketFd < 0)
         return false;
 
+    if(data == nullptr)
+        return false;
+
     struct can_frame frame {};
 
     int n = read(socketFd, &frame, sizeof(frame));
@@ -79,6 +85,9 @@ bool Transport_CAN_Linux::receiveFrame(uint32_t& id,
         return false;
 
     id  = frame.can_id & CAN_EFF_MASK;
+    if(frame.can_dlc > CAN_MAX_DLEN)
+        return false;
+
     len = frame.can_dlc;
     std::memcpy(data, frame.data, len);
 

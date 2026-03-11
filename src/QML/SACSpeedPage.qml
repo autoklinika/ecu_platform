@@ -18,7 +18,7 @@ Item {
         height: btnH
         x: startX
         y: startY
-        text: "250 kbps"
+        text: LanguageManager.t("kafelek_can_250")
 
         onClicked: {
             // docelowo: start CAN 250
@@ -32,7 +32,7 @@ Item {
         height: btnH
         x: startX + btnW + gapX
         y: startY
-        text: "500 kbps"
+        text: LanguageManager.t("kafelek_can_500")
 
         onClicked: {
             // docelowo: start CAN 500
@@ -47,6 +47,10 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 40
-        onClicked: Navigation.pop()
+        onClicked: {
+            CockpitController.disconnect()
+            SystemController.resetCAN("can0")
+            Navigation.pop()
+        }
     }
 }

@@ -3,6 +3,18 @@
 #include <QProcess>
 #include <QNetworkInterface>
 #include <QAbstractSocket>
+#include <QThread>
+
+namespace {
+
+bool isWirelessInterfaceName(const QString& name)
+{
+    return name.startsWith("wl") || name.startsWith("wlan");
+}
+
+constexpr unsigned long CAN_SWITCH_DELAY_MS = 120;
+
+}
 
 // =====================================================
 // Konstruktor
@@ -48,15 +60,28 @@ bool SystemController::configureCAN(const QString& iface, int bitrate)
     ok &= runCommand("sudo",
                      {"ip", "link", "set", iface, "down"});
 
+    QThread::msleep(CAN_SWITCH_DELAY_MS);
+
     ok &= runCommand("sudo",
                      {"ip", "link", "set", iface,
                       "type", "can",
                       "bitrate", QString::number(bitrate)});
 
+    QThread::msleep(CAN_SWITCH_DELAY_MS);
+
     ok &= runCommand("sudo",
                      {"ip", "link", "set", iface, "up"});
 
     return ok;
+}
+
+bool SystemController::resetCAN(const QString& iface)
+{
+    if (iface.isEmpty())
+        return false;
+
+    return runCommand("sudo",
+                      {"ip", "link", "set", iface, "down"});
 }
 
 // =====================================================
@@ -93,10 +118,14 @@ QString SystemController::wifiStatus()
     const QList<QNetworkInterface> interfaces =
         QNetworkInterface::allInterfaces();
 
+    bool wifiDetected = false;
+
     for (const QNetworkInterface &iface : interfaces)
     {
-        if (iface.name() == "wlan0")
+        if (isWirelessInterfaceName(iface.name()))
         {
+            wifiDetected = true;
+
             bool isUp =
                 iface.flags().testFlag(QNetworkInterface::IsUp) &&
                 iface.flags().testFlag(QNetworkInterface::IsRunning);
@@ -120,7 +149,7 @@ QString SystemController::wifiStatus()
         }
     }
 
-    return "unavailable";
+    return wifiDetected ? "disconnected" : "unavailable";
 }
 
 bool SystemController::isWifiConnected()

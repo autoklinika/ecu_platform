@@ -3,10 +3,12 @@ import QtQuick.Controls
 import ecu_gui 1.0
 
 Item {
+    id: root
 
-    property string vin: "YS2R4X20005399401"
-    property string sw:  "SW_2.14.07"
-    property string hw:  "HW_1.02"
+    // Values provided from Navigation.push(..., { vin, sw, hw })
+    property string vin: "---"
+    property string sw: "---"
+    property string hw: "---"
 
     Column {
         anchors.centerIn: parent
@@ -16,37 +18,48 @@ Item {
             text: "VIN"
             font.pixelSize: 24
             color: "#666666"
+            horizontalAlignment: Text.AlignHCenter
+            width: 700
         }
 
         Text {
-            text: vin
+            text: root.vin
             font.pixelSize: 40
             font.bold: true
             color: "#2A2A2A"
+            horizontalAlignment: Text.AlignHCenter
+            width: 900
+            wrapMode: Text.WrapAnywhere
         }
 
         Rectangle {
-            width: 600
+            width: 700
             height: 2
             color: "#CCCCCC"
         }
 
         Text {
-            text: "SW: " + sw
+            text: "SW: " + root.sw
             font.pixelSize: 26
             color: "#444444"
+            horizontalAlignment: Text.AlignHCenter
+            width: 700
+            wrapMode: Text.WrapAnywhere
         }
 
         Text {
-            text: "HW: " + hw
+            text: "HW: " + root.hw
             font.pixelSize: 26
             color: "#444444"
+            horizontalAlignment: Text.AlignHCenter
+            width: 700
+            wrapMode: Text.WrapAnywhere
         }
 
         StyledButton {
             width: 240
             height: 90
-            text: "OK"
+            text: LanguageManager.t("kafelek_ok")
             onClicked: Navigation.push("SACMenuPage.qml")
         }
     }
