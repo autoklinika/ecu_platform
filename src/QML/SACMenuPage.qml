@@ -10,6 +10,52 @@ Item {
 
     property bool modalOpen: false
 
+    function paramLabel(index) {
+        switch (index) {
+        case 0: return "Pressure 1"
+        case 1: return "Pressure 2"
+        case 2: return "Battery Permanent"
+        case 3: return "Battery Ignition"
+        default: return "---"
+        }
+    }
+
+    function paramUnit(index) {
+        switch (index) {
+        case 0:
+        case 1:
+            return "bar"
+        case 2:
+        case 3:
+            return "V"
+        default:
+            return ""
+        }
+    }
+
+    function paramValid(index) {
+        switch (index) {
+        case 0: return CockpitController.pressure1Valid
+        case 1: return CockpitController.pressure2Valid
+        case 2: return CockpitController.voltagePermanentValid
+        case 3: return CockpitController.voltageIgnitionValid
+        default: return false
+        }
+    }
+
+    function paramValue(index) {
+        if (!paramValid(index))
+            return "---"
+
+        switch (index) {
+        case 0: return Number(CockpitController.pressure1Bar).toFixed(2)
+        case 1: return Number(CockpitController.pressure2Bar).toFixed(2)
+        case 2: return Number(CockpitController.voltagePermanent).toFixed(1)
+        case 3: return Number(CockpitController.voltageIgnition).toFixed(1)
+        default: return "---"
+        }
+    }
+
     Rectangle {
         anchors.fill: parent
         color: theme.bgColor
@@ -81,7 +127,7 @@ Item {
                     anchors.margins: 10
                     clip: true
                     spacing: 2
-                    model: 6
+                    model: 4
 
                     delegate: Rectangle {
                         width: paramsListView.width
@@ -95,7 +141,7 @@ Item {
                             anchors.left: parent.left
                             anchors.leftMargin: 16
                             width: parent.width * 0.55
-                            text: "Parameter " + (index + 1)
+                            text: root.paramLabel(index)
                             font.pixelSize: 24
                             color: theme.textColorDark
                             elide: Text.ElideRight
@@ -105,10 +151,15 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.right: parent.right
                             anchors.rightMargin: 16
-                            width: parent.width * 0.28
-                            text: (Math.random() * 10).toFixed(2) + " bar"
+                            width: parent.width * 0.30
+                            text: {
+                                const v = root.paramValue(index)
+                                if (v === "---")
+                                    return "---"
+                                return v + " " + root.paramUnit(index)
+                            }
                             font.pixelSize: 24
-                            color: theme.textColorMuted
+                            color: root.paramValid(index) ? theme.textColorMuted : "#999999"
                             horizontalAlignment: Text.AlignRight
                             elide: Text.ElideRight
                         }

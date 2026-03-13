@@ -1,4 +1,5 @@
 #include "CockpitController.h"
+#include <QtGlobal>
 
 namespace
 {
@@ -69,7 +70,35 @@ bool CockpitController::start(QString iface, int bitrate)
     emit swChanged();
     emit hwChanged();
 
-    clearDTCData();
+    m_pressure1Bar = 0.0;
+    m_pressure2Bar = 0.0;
+    m_voltagePermanent = 0.0;
+    m_voltageIgnition = 0.0;
+
+    m_pressure1Valid = false;
+    m_pressure2Valid = false;
+    m_voltagePermanentValid = false;
+    m_voltageIgnitionValid = false;
+
+    emit pressure1BarChanged();
+    emit pressure2BarChanged();
+    emit voltagePermanentChanged();
+    emit voltageIgnitionChanged();
+
+    emit pressure1ValidChanged();
+    emit pressure2ValidChanged();
+    emit voltagePermanentValidChanged();
+    emit voltageIgnitionValidChanged();
+
+    m_dtcList.clear();
+    m_dtcBusy = false;
+    m_dtcReady = false;
+    m_dtcError.clear();
+
+    emit dtcListChanged();
+    emit dtcBusyChanged();
+    emit dtcReadyChanged();
+    emit dtcErrorChanged();
 
     engine.stop();
     engine.start();
@@ -106,7 +135,35 @@ void CockpitController::disconnect()
     emit swChanged();
     emit hwChanged();
 
-    clearDTCData();
+    m_pressure1Bar = 0.0;
+    m_pressure2Bar = 0.0;
+    m_voltagePermanent = 0.0;
+    m_voltageIgnition = 0.0;
+
+    m_pressure1Valid = false;
+    m_pressure2Valid = false;
+    m_voltagePermanentValid = false;
+    m_voltageIgnitionValid = false;
+
+    emit pressure1BarChanged();
+    emit pressure2BarChanged();
+    emit voltagePermanentChanged();
+    emit voltageIgnitionChanged();
+
+    emit pressure1ValidChanged();
+    emit pressure2ValidChanged();
+    emit voltagePermanentValidChanged();
+    emit voltageIgnitionValidChanged();
+
+    m_dtcList.clear();
+    m_dtcBusy = false;
+    m_dtcReady = false;
+    m_dtcError.clear();
+
+    emit dtcListChanged();
+    emit dtcBusyChanged();
+    emit dtcReadyChanged();
+    emit dtcErrorChanged();
 }
 
 QString CockpitController::readVIN() const
@@ -114,37 +171,24 @@ QString CockpitController::readVIN() const
     return m_vin;
 }
 
-void CockpitController::startDTCRead()
+void CockpitController::setRuntimePollingEnabled(bool enabled)
 {
-    clearDTCData();
-    engine.readDTC();
+    engine.setRuntimePollingEnabled(enabled);
 }
 
-void CockpitController::clearDTCData()
+void CockpitController::startDTCRead()
 {
-    if (!m_dtcList.isEmpty())
-    {
-        m_dtcList.clear();
-        emit dtcListChanged();
-    }
+    m_dtcList.clear();
+    m_dtcBusy = true;
+    m_dtcReady = false;
+    m_dtcError.clear();
 
-    if (m_dtcBusy != false)
-    {
-        m_dtcBusy = false;
-        emit dtcBusyChanged();
-    }
+    emit dtcListChanged();
+    emit dtcBusyChanged();
+    emit dtcReadyChanged();
+    emit dtcErrorChanged();
 
-    if (m_dtcReady != false)
-    {
-        m_dtcReady = false;
-        emit dtcReadyChanged();
-    }
-
-    if (!m_dtcError.isEmpty())
-    {
-        m_dtcError.clear();
-        emit dtcErrorChanged();
-    }
+    engine.readDTC();
 }
 
 void CockpitController::poll()
@@ -194,9 +238,56 @@ void CockpitController::poll()
         emit ecuReadyChanged();
     }
 
+    if (!qFuzzyCompare(m_pressure1Bar + 1.0, static_cast<double>(data.pressure1Bar) + 1.0))
+    {
+        m_pressure1Bar = data.pressure1Bar;
+        emit pressure1BarChanged();
+    }
+
+    if (!qFuzzyCompare(m_pressure2Bar + 1.0, static_cast<double>(data.pressure2Bar) + 1.0))
+    {
+        m_pressure2Bar = data.pressure2Bar;
+        emit pressure2BarChanged();
+    }
+
+    if (!qFuzzyCompare(m_voltagePermanent + 1.0, static_cast<double>(data.voltagePermanent) + 1.0))
+    {
+        m_voltagePermanent = data.voltagePermanent;
+        emit voltagePermanentChanged();
+    }
+
+    if (!qFuzzyCompare(m_voltageIgnition + 1.0, static_cast<double>(data.voltageIgnition) + 1.0))
+    {
+        m_voltageIgnition = data.voltageIgnition;
+        emit voltageIgnitionChanged();
+    }
+
+    if (m_pressure1Valid != data.pressure1Valid)
+    {
+        m_pressure1Valid = data.pressure1Valid;
+        emit pressure1ValidChanged();
+    }
+
+    if (m_pressure2Valid != data.pressure2Valid)
+    {
+        m_pressure2Valid = data.pressure2Valid;
+        emit pressure2ValidChanged();
+    }
+
+    if (m_voltagePermanentValid != data.voltagePermanentValid)
+    {
+        m_voltagePermanentValid = data.voltagePermanentValid;
+        emit voltagePermanentValidChanged();
+    }
+
+    if (m_voltageIgnitionValid != data.voltageIgnitionValid)
+    {
+        m_voltageIgnitionValid = data.voltageIgnitionValid;
+        emit voltageIgnitionValidChanged();
+    }
+
     QStringList newDtcList;
     newDtcList.reserve(static_cast<int>(data.dtcs.size()));
-
     for (const auto& rec : data.dtcs)
         newDtcList.push_back(formatDTCLine(rec));
 
@@ -206,13 +297,13 @@ void CockpitController::poll()
         emit dtcListChanged();
     }
 
-    if (data.dtcBusy != m_dtcBusy)
+    if (m_dtcBusy != data.dtcBusy)
     {
         m_dtcBusy = data.dtcBusy;
         emit dtcBusyChanged();
     }
 
-    if (data.dtcReady != m_dtcReady)
+    if (m_dtcReady != data.dtcReady)
     {
         m_dtcReady = data.dtcReady;
         emit dtcReadyChanged();

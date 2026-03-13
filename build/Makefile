@@ -997,6 +997,30 @@ src/ecu/sac/SAC_Module.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/src/ecu/sac/SAC_Module.cpp.s
 .PHONY : src/ecu/sac/SAC_Module.cpp.s
 
+src/ecu/sac/SAC_Runtime_Module.o: src/ecu/sac/SAC_Runtime_Module.cpp.o
+.PHONY : src/ecu/sac/SAC_Runtime_Module.o
+
+# target to build an object file
+src/ecu/sac/SAC_Runtime_Module.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/src/ecu/sac/SAC_Runtime_Module.cpp.o
+.PHONY : src/ecu/sac/SAC_Runtime_Module.cpp.o
+
+src/ecu/sac/SAC_Runtime_Module.i: src/ecu/sac/SAC_Runtime_Module.cpp.i
+.PHONY : src/ecu/sac/SAC_Runtime_Module.i
+
+# target to preprocess a source file
+src/ecu/sac/SAC_Runtime_Module.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/src/ecu/sac/SAC_Runtime_Module.cpp.i
+.PHONY : src/ecu/sac/SAC_Runtime_Module.cpp.i
+
+src/ecu/sac/SAC_Runtime_Module.s: src/ecu/sac/SAC_Runtime_Module.cpp.s
+.PHONY : src/ecu/sac/SAC_Runtime_Module.s
+
+# target to generate assembly for a file
+src/ecu/sac/SAC_Runtime_Module.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/src/ecu/sac/SAC_Runtime_Module.cpp.s
+.PHONY : src/ecu/sac/SAC_Runtime_Module.cpp.s
+
 src/isotp/ISOTP.o: src/isotp/ISOTP.cpp.o
 .PHONY : src/isotp/ISOTP.o
 
@@ -1273,6 +1297,9 @@ help:
 	@echo "... src/ecu/sac/SAC_Module.o"
 	@echo "... src/ecu/sac/SAC_Module.i"
 	@echo "... src/ecu/sac/SAC_Module.s"
+	@echo "... src/ecu/sac/SAC_Runtime_Module.o"
+	@echo "... src/ecu/sac/SAC_Runtime_Module.i"
+	@echo "... src/ecu/sac/SAC_Runtime_Module.s"
 	@echo "... src/isotp/ISOTP.o"
 	@echo "... src/isotp/ISOTP.i"
 	@echo "... src/isotp/ISOTP.s"

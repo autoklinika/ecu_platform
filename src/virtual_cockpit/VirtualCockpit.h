@@ -6,7 +6,9 @@
 #include <memory>
 #include <queue>
 #include <chrono>
+#include <optional>
 #include <vector>
+#include <string>
 
 #include "transport/Transport_CAN_Linux.h"
 #include "core/FrameQueue.h"
@@ -14,6 +16,7 @@
 #include "isotp/ISOTP.h"
 #include "uds/UDS_Core.h"
 #include "ecu/sac/SAC_Module.h"
+#include "ecu/sac/SAC_Runtime_Module.h"
 #include "ecu/sac/SAC_DTC_Module.h"
 #include "Logger.h"
 
@@ -32,6 +35,8 @@ public:
     void connect();
     void disconnect();
     void readDTC();
+
+    void setRuntimePollingEnabled(bool enabled);
 
     enum class State
     {
@@ -58,6 +63,16 @@ public:
         std::string hw;
         std::string lastError;
         bool ecuReady = false;
+
+        float pressure1Bar = 0.0f;
+        float pressure2Bar = 0.0f;
+        float voltagePermanent = 0.0f;
+        float voltageIgnition = 0.0f;
+
+        bool pressure1Valid = false;
+        bool pressure2Valid = false;
+        bool voltagePermanentValid = false;
+        bool voltageIgnitionValid = false;
 
         bool dtcBusy = false;
         bool dtcReady = false;
@@ -86,6 +101,7 @@ private:
 
     std::atomic<bool> running{false};
     std::atomic<State> state{State::Idle};
+    std::atomic<bool> runtimePollingEnabled{true};
 
     std::string canInterface;
     int canBitrate = 0;
@@ -97,6 +113,7 @@ private:
     std::unique_ptr<ISOTP> isotp;
     std::unique_ptr<UDS_Core> udsCore;
     std::unique_ptr<SAC_Module> sac;
+    std::unique_ptr<SAC_Runtime_Module> sacRuntime;
     std::unique_ptr<SAC_DTC_Module> sacDtc;
 
     std::chrono::steady_clock::time_point lastFrameTime;
