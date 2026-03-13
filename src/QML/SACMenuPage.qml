@@ -73,13 +73,13 @@ Item {
     Item {
         id: contentArea
         anchors.top: topBar.bottom
-        anchors.bottom: bottomButtons.top
+        anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.leftMargin: 24
         anchors.rightMargin: 24
         anchors.topMargin: 12
-        anchors.bottomMargin: 16
+        anchors.bottomMargin: 20
 
         Rectangle {
             id: paramsPanel
@@ -170,21 +170,6 @@ Item {
                     }
                 }
             }
-        }
-    }
-
-    Row {
-        id: bottomButtons
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 28
-        anchors.horizontalCenter: parent.horizontalCenter
-        spacing: 24
-
-        StyledButton {
-            width: 220
-            height: 80
-            text: LanguageManager.t("kafelek_back")
-            onClicked: Navigation.pop()
         }
     }
 
