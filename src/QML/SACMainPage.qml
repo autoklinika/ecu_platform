@@ -1,0 +1,66 @@
+import QtQuick
+import QtQuick.Controls
+import ecu_gui 1.0
+
+Item {
+    id: root
+
+    // Values provided from Navigation.push(..., { vin, sw, hw })
+    property string vin: "---"
+    property string sw: "---"
+    property string hw: "---"
+
+    Column {
+        anchors.centerIn: parent
+        spacing: 30
+
+        Text {
+            text: "VIN"
+            font.pixelSize: 24
+            color: "#666666"
+            horizontalAlignment: Text.AlignHCenter
+            width: 700
+        }
+
+        Text {
+            text: root.vin
+            font.pixelSize: 40
+            font.bold: true
+            color: "#2A2A2A"
+            horizontalAlignment: Text.AlignHCenter
+            width: 900
+            wrapMode: Text.WrapAnywhere
+        }
+
+        Rectangle {
+            width: 700
+            height: 2
+            color: "#CCCCCC"
+        }
+
+        Text {
+            text: "SW: " + root.sw
+            font.pixelSize: 26
+            color: "#444444"
+            horizontalAlignment: Text.AlignHCenter
+            width: 700
+            wrapMode: Text.WrapAnywhere
+        }
+
+        Text {
+            text: "HW: " + root.hw
+            font.pixelSize: 26
+            color: "#444444"
+            horizontalAlignment: Text.AlignHCenter
+            width: 700
+            wrapMode: Text.WrapAnywhere
+        }
+
+        StyledButton {
+            width: 240
+            height: 90
+            text: LanguageManager.t("kafelek_ok")
+            onClicked: Navigation.push("SACMenuPage.qml")
+        }
+    }
+}
