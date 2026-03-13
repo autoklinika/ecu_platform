@@ -12,10 +12,15 @@ Item {
 
     Theme { id: theme }
 
+    Rectangle {
+        anchors.fill: parent
+        color: theme.bgColor
+    }
+
     Column {
-        width: parent.width
-        anchors.top: parent.top
-        anchors.topMargin: 28
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: -20
         spacing: 24
 
         Text {

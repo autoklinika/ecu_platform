@@ -32,43 +32,90 @@ Item {
         anchors.right: parent.right
         anchors.leftMargin: 24
         anchors.rightMargin: 24
-        anchors.topMargin: 0
+        anchors.topMargin: 12
         anchors.bottomMargin: 16
 
         Rectangle {
-            width: 980
-            height: 420
-            anchors.centerIn: parent
+            id: paramsPanel
+            anchors.fill: parent
             radius: 20
             color: theme.cardColor
             border.color: theme.separatorColor
 
             Column {
-                anchors.centerIn: parent
-                width: parent.width - 60
-                spacing: 18
+                id: headerColumn
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: 24
+                anchors.rightMargin: 24
+                anchors.topMargin: 24
+                spacing: 14
 
-                Repeater {
+                Text {
+                    text: "PARAMETERS"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    font.pixelSize: 34
+                    font.bold: true
+                    color: theme.textColorDark
+                }
+            }
+
+            Rectangle {
+                id: listContainer
+                anchors.top: headerColumn.bottom
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: 24
+                anchors.rightMargin: 24
+                anchors.topMargin: 20
+                anchors.bottomMargin: 24
+                radius: 14
+                color: "#FFFFFF"
+                border.color: theme.separatorColor
+
+                ListView {
+                    id: paramsListView
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    clip: true
+                    spacing: 2
                     model: 6
 
-                    Row {
-                        width: parent.width
-                        spacing: 260
+                    delegate: Rectangle {
+                        width: paramsListView.width
+                        height: 56
+                        radius: 8
+                        color: index % 2 === 0 ? "#F6F6F6" : "#FFFFFF"
+                        border.color: "#DDDDDD"
 
                         Text {
-                            width: 420
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            anchors.leftMargin: 16
+                            width: parent.width * 0.55
                             text: "Parameter " + (index + 1)
-                            font.pixelSize: 26
+                            font.pixelSize: 24
                             color: theme.textColorDark
+                            elide: Text.ElideRight
                         }
 
                         Text {
-                            width: 220
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.right: parent.right
+                            anchors.rightMargin: 16
+                            width: parent.width * 0.28
                             text: (Math.random() * 10).toFixed(2) + " bar"
-                            font.pixelSize: 26
+                            font.pixelSize: 24
                             color: theme.textColorMuted
                             horizontalAlignment: Text.AlignRight
+                            elide: Text.ElideRight
                         }
+                    }
+
+                    ScrollBar.vertical: ScrollBar {
+                        active: true
                     }
                 }
             }
@@ -80,18 +127,13 @@ Item {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 28
         anchors.horizontalCenter: parent.horizontalCenter
-        spacing: 40
+        spacing: 24
 
         StyledButton {
-            text: LanguageManager.t("kafelek_prev")
             width: 220
             height: 80
-        }
-
-        StyledButton {
-            text: LanguageManager.t("kafelek_next")
-            width: 220
-            height: 80
+            text: LanguageManager.t("kafelek_back")
+            onClicked: Navigation.pop()
         }
     }
 
@@ -100,7 +142,7 @@ Item {
         width: 360
         height: 320
         radius: 26
-        color: "white"
+        color: "#FFFFFF"
         border.color: theme.borderColor
         x: 32
         y: topBar.height + 16

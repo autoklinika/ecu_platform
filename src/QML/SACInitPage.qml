@@ -3,6 +3,7 @@ import QtQuick.Controls
 import ecu_gui 1.0
 
 Item {
+    id: root
     anchors.fill: parent
 
     property int speed: 250
@@ -15,10 +16,15 @@ Item {
 
     Theme { id: theme }
 
+    Rectangle {
+        anchors.fill: parent
+        color: theme.bgColor
+    }
+
     Column {
-        width: parent.width
-        anchors.top: parent.top
-        anchors.topMargin: 40
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: -20
         spacing: 28
 
         Text {
@@ -39,6 +45,7 @@ Item {
         BusyIndicator {
             anchors.horizontalCenter: parent.horizontalCenter
             running: !connectionError
+            visible: !connectionError
             width: 60
             height: 60
         }

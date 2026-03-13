@@ -36,20 +36,25 @@ Item {
         anchors.right: parent.right
         anchors.leftMargin: 24
         anchors.rightMargin: 24
+        anchors.topMargin: 12
         anchors.bottomMargin: 16
 
         Rectangle {
-            width: 980
-            height: 470
-            anchors.centerIn: parent
+            id: dtcPanel
+            anchors.fill: parent
             radius: 20
             color: theme.cardColor
             border.color: theme.separatorColor
 
             Column {
-                anchors.fill: parent
-                anchors.margins: 24
-                spacing: 18
+                id: headerColumn
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: 24
+                anchors.rightMargin: 24
+                anchors.topMargin: 24
+                spacing: 14
 
                 Text {
                     text: "DTC READOUT"
@@ -57,11 +62,6 @@ Item {
                     font.pixelSize: 34
                     font.bold: true
                     color: theme.textColorDark
-                }
-
-                Item {
-                    width: 1
-                    height: 8
                 }
 
                 Text {
@@ -92,53 +92,67 @@ Item {
 
                 Text {
                     visible: CockpitController.dtcReady
+                    anchors.horizontalCenter: parent.horizontalCenter
                     text: "Stored DTC count: " + CockpitController.dtcList.length
                     font.pixelSize: 24
                     font.bold: true
                     color: theme.textColorDark
-                    anchors.horizontalCenter: parent.horizontalCenter
                 }
 
                 Text {
                     visible: CockpitController.dtcReady && CockpitController.dtcList.length === 0
+                    anchors.horizontalCenter: parent.horizontalCenter
                     text: "No stored DTC"
                     font.pixelSize: 22
                     color: theme.textColorMuted
-                    anchors.horizontalCenter: parent.horizontalCenter
                 }
+            }
 
-                Rectangle {
-                    visible: CockpitController.dtcReady && CockpitController.dtcList.length > 0
-                    width: parent.width
-                    height: 280
-                    radius: 14
-                    color: "#FFFFFF"
-                    border.color: theme.separatorColor
+            Rectangle {
+                id: listContainer
+                visible: CockpitController.dtcReady && CockpitController.dtcList.length > 0
+                anchors.top: headerColumn.bottom
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: 24
+                anchors.rightMargin: 24
+                anchors.topMargin: 20
+                anchors.bottomMargin: 24
+                radius: 14
+                color: "#FFFFFF"
+                border.color: theme.separatorColor
 
-                    ListView {
-                        anchors.fill: parent
-                        anchors.margins: 10
-                        clip: true
-                        model: CockpitController.dtcList
+                ListView {
+                    id: dtcListView
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    clip: true
+                    spacing: 2
+                    model: CockpitController.dtcList
 
-                        delegate: Rectangle {
-                            width: ListView.view.width
-                            height: 52
-                            color: index % 2 === 0 ? "#F6F6F6" : "#FFFFFF"
-                            border.color: "#DDDDDD"
+                    delegate: Rectangle {
+                        width: dtcListView.width
+                        height: 54
+                        radius: 8
+                        color: index % 2 === 0 ? "#F6F6F6" : "#FFFFFF"
+                        border.color: "#DDDDDD"
 
-                            Text {
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 16
-                                anchors.right: parent.right
-                                anchors.rightMargin: 16
-                                text: modelData
-                                font.pixelSize: 22
-                                color: theme.textColorDark
-                                elide: Text.ElideRight
-                            }
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            anchors.leftMargin: 16
+                            anchors.right: parent.right
+                            anchors.rightMargin: 16
+                            text: modelData
+                            font.pixelSize: 22
+                            color: theme.textColorDark
+                            elide: Text.ElideRight
                         }
+                    }
+
+                    ScrollBar.vertical: ScrollBar {
+                        active: true
                     }
                 }
             }
