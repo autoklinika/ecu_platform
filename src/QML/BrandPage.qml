@@ -3,16 +3,18 @@ import QtQuick.Controls
 import ecu_gui 1.0
 
 Item {
+    id: root
     anchors.fill: parent
-    property string brand: ""
+
+    //property string brand: ""
 
     Theme { id: theme }
 
     Column {
-        width: parent.width
-        anchors.top: parent.top
-        anchors.topMargin: 28
-        spacing: 42
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: -20
+        spacing: 36
 
         Text {
             text: brand
@@ -32,12 +34,12 @@ Item {
     }
 
     StyledButton {
-        width: 200
+        width: 220
         height: 90
+        text: LanguageManager.t("kafelek_back")
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 40
-        text: LanguageManager.t("kafelek_back")
         onClicked: Navigation.pop()
     }
 }

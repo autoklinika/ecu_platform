@@ -3,60 +3,71 @@ import QtQuick.Controls
 import ecu_gui 1.0
 
 Item {
+    id: root
+    anchors.fill: parent
 
-    property int btnW: 280
-    property int btnH: 120
-    property int gapX: 60
-    property int gapY: 60
+    Theme { id: theme }
 
-    property int cols: 3
-    property int rows: 2
+    Column {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: -10
+        spacing: 34
 
-    // Wysokość siatki
-    property int gridHeight: rows * btnH + (rows - 1) * gapY
-    property int gridWidth: cols * btnW + (cols - 1) * gapX
+       
 
-    // Obszar roboczy (bez BACK)
-    property int bottomReserved: 150   // 90 przycisk + 40 margin + zapas
+        Grid {
+            anchors.horizontalCenter: parent.horizontalCenter
+            columns: 3
+            rowSpacing: 28
+            columnSpacing: 28
 
-    // Środek między topem strony a dolnym przyciskiem
-    property int startX: (width - gridWidth) / 2
-    property int startY: (height - bottomReserved - gridHeight) / 2
+            StyledButton {
+                width: 220
+                height: 110
+                text: "DAF"
+                onClicked: Navigation.push("BrandPage.qml", { brand: "DAF" })
+            }
 
-    property var brands: ["DAF","MAN","SCANIA","IVECO","MB","VOLVO"]
+            StyledButton {
+                width: 220
+                height: 110
+                text: "MAN"
+            }
 
-    Repeater {
-        model: brands.length
+            StyledButton {
+                width: 220
+                height: 110
+                text: "SCANIA"
+            }
 
-        StyledButton {
-            width: btnW
-            height: btnH
+            StyledButton {
+                width: 220
+                height: 110
+                text: "IVECO"
+            }
 
-            property int col: index % cols
-            property int row: Math.floor(index / cols)
+            StyledButton {
+                width: 220
+                height: 110
+                text: "MB"
+            }
 
-            x: startX + col * (btnW + gapX)
-            y: startY + row * (btnH + gapY)
-
-            text: brands[index]
-
-            onClicked: {
-                if (brands[index] === "DAF")
-                    Navigation.push("BrandPage.qml", { brand: "DAF" })
+            StyledButton {
+                width: 220
+                height: 110
+                text: "VOLVO"
             }
         }
     }
 
-    // BACK – stała pozycja przy dole
     StyledButton {
-        width: 240
+        width: 220
         height: 90
         text: LanguageManager.t("kafelek_back")
-
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 40
-
         onClicked: Navigation.pop()
     }
 }

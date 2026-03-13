@@ -3,15 +3,16 @@ import QtQuick.Controls
 import ecu_gui 1.0
 
 Item {
+    id: root
     anchors.fill: parent
 
     Theme { id: theme }
 
     Column {
-        width: parent.width
-        anchors.top: parent.top
-        anchors.topMargin: 28
-        spacing: 34
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: -20
+        spacing: 32
 
         Text {
             text: LanguageManager.t("settings_language")

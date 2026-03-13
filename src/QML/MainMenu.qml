@@ -50,7 +50,7 @@ Item {
         onClicked: Navigation.push("InfoPage.qml")
     }
      StyledButton {
-        text: "\u23FB"
+        text: "Exit"
         width: 150
         height: 80
 
