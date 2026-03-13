@@ -4,63 +4,77 @@ import ecu_gui 1.0
 
 Item {
     id: root
+    anchors.fill: parent
 
-    // Values provided from Navigation.push(..., { vin, sw, hw })
     property string vin: "---"
     property string sw: "---"
     property string hw: "---"
 
+    Theme { id: theme }
+
     Column {
-        anchors.centerIn: parent
-        spacing: 30
+        width: parent.width
+        anchors.top: parent.top
+        anchors.topMargin: 28
+        spacing: 24
 
         Text {
             text: "VIN"
+            anchors.horizontalCenter: parent.horizontalCenter
             font.pixelSize: 24
-            color: "#666666"
-            horizontalAlignment: Text.AlignHCenter
-            width: 700
+            color: theme.textColorMuted
         }
 
         Text {
             text: root.vin
+            width: 980
+            anchors.horizontalCenter: parent.horizontalCenter
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.WrapAnywhere
             font.pixelSize: 40
             font.bold: true
-            color: "#2A2A2A"
-            horizontalAlignment: Text.AlignHCenter
-            width: 900
-            wrapMode: Text.WrapAnywhere
+            color: theme.textColorDark
         }
 
         Rectangle {
-            width: 700
+            width: 760
             height: 2
-            color: "#CCCCCC"
+            anchors.horizontalCenter: parent.horizontalCenter
+            color: theme.separatorColor
         }
 
-        Text {
-            text: "SW: " + root.sw
-            font.pixelSize: 26
-            color: "#444444"
-            horizontalAlignment: Text.AlignHCenter
-            width: 700
-            wrapMode: Text.WrapAnywhere
-        }
+        Column {
+            width: 900
+            anchors.horizontalCenter: parent.horizontalCenter
+            spacing: 16
 
-        Text {
-            text: "HW: " + root.hw
-            font.pixelSize: 26
-            color: "#444444"
-            horizontalAlignment: Text.AlignHCenter
-            width: 700
-            wrapMode: Text.WrapAnywhere
-        }
+            Text {
+                text: "SW: " + root.sw
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.WrapAnywhere
+                font.pixelSize: 28
+                color: theme.textColorDark
+            }
 
-        StyledButton {
-            width: 240
-            height: 90
-            text: LanguageManager.t("kafelek_ok")
-            onClicked: Navigation.push("SACMenuPage.qml")
+            Text {
+                text: "HW: " + root.hw
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.WrapAnywhere
+                font.pixelSize: 28
+                color: theme.textColorDark
+            }
         }
+    }
+
+    StyledButton {
+        width: 240
+        height: 90
+        text: LanguageManager.t("kafelek_ok")
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 40
+        onClicked: Navigation.push("SACMenuPage.qml")
     }
 }

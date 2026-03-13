@@ -4,88 +4,65 @@ import ecu_gui 1.0
 
 Item {
     id: root
-    width: parent.width
-    height: parent.height * (60 / 480)
+    width: parent ? parent.width : 1280
+    height: 96
 
-    property bool online: true
-    property string vin: "YS2R4X20005399401"
+    property bool online: CockpitController.connected
+    property string vin: CockpitController.vin
 
     signal menuClicked()
 
-    readonly property real scaleX: width / 800
-    readonly property real scaleY: parent.height / 480
+    Theme { id: theme }
 
     Rectangle {
         anchors.fill: parent
-        color: "#CFCFCF"
+        color: theme.topBarColor
     }
 
-    /*
-        SAC MODULE text (20,20)
-    */
-
-
-    /*
-        MENU button (10,10,120,40)
-        overlay – jak Arduino
-    */
     StyledButton {
-        x: 10 * scaleX
-        y: 10 * scaleY
-        width: 120 * scaleX
-        height: 40 * scaleY
+        anchors.left: parent.left
+        anchors.leftMargin: 16
+        anchors.verticalCenter: parent.verticalCenter
+        width: 192
+        height: 64
         text: LanguageManager.t("kafelek_menu")
         onClicked: root.menuClicked()
     }
 
-    /*
-        STATUS (centerX = 400)
-    */
-    Item {
-        x: (400 * scaleX)
-        y: 18 * scaleY
+    
 
-        Row {
-            spacing: 6 * scaleX
+    Row {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: 12
 
-            Rectangle {
-                width: 10 * scaleX
-                height: 10 * scaleX
-                radius: 5 * scaleX
-                color: online ? "#00A000" : "#D00000"
-            }
+        Rectangle {
+            width: 16
+            height: 16
+            radius: 8
+            color: root.online ? "#0A9F34" : "#D22D2D"
+        }
 
-            Text {
-                text: online ? "ONLINE" : "OFFLINE"
-                font.pixelSize: 16 * scaleY
-                font.bold: true
-                color: online ? "#00A000" : "#D00000"
-            }
+        Text {
+            text: root.online ? "ONLINE" : "OFFLINE"
+            font.pixelSize: 26
+            font.bold: true
+            color: root.online ? "#0A9F34" : "#D22D2D"
         }
     }
 
-    /*
-        VIN right aligned like 780 - width
-    */
     Text {
-        id: vinText
-        font.pixelSize: 16 * scaleY
+        anchors.right: parent.right
+        anchors.rightMargin: 32
+        anchors.verticalCenter: parent.verticalCenter
+        font.pixelSize: 26
         font.bold: true
-        color: "#2A2A2A"
-
+        color: theme.textColorDark
         text: {
-            if (vin.length >= 7)
-                return vin.slice(vin.length - 7)
-            return vin
-        }
-
-        Component.onCompleted: {
-            x = (780 * scaleX) - width
-            y = 20 * scaleY
-        }
-
-        onWidthChanged: {
-            x = (780 * scaleX) - width
+            const currentVin = root.vin || "---"
+            if (currentVin.length >= 7)
+                return currentVin.slice(currentVin.length - 7)
+            return currentVin
         }
     }
 }

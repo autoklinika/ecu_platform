@@ -6,6 +6,7 @@
 #include <memory>
 #include <queue>
 #include <chrono>
+#include <vector>
 
 #include "transport/Transport_CAN_Linux.h"
 #include "core/FrameQueue.h"
@@ -13,6 +14,7 @@
 #include "isotp/ISOTP.h"
 #include "uds/UDS_Core.h"
 #include "ecu/sac/SAC_Module.h"
+#include "ecu/sac/SAC_DTC_Module.h"
 #include "Logger.h"
 
 class VirtualCockpit
@@ -29,6 +31,7 @@ public:
 
     void connect();
     void disconnect();
+    void readDTC();
 
     enum class State
     {
@@ -42,6 +45,12 @@ public:
 
     State getState() const;
 
+    struct DTCRecord
+    {
+        uint32_t code = 0;
+        uint8_t status = 0;
+    };
+
     struct RuntimeData
     {
         std::string vin;
@@ -49,6 +58,11 @@ public:
         std::string hw;
         std::string lastError;
         bool ecuReady = false;
+
+        bool dtcBusy = false;
+        bool dtcReady = false;
+        std::string dtcError;
+        std::vector<DTCRecord> dtcs;
     };
 
     RuntimeData getRuntime() const;
@@ -71,7 +85,6 @@ private:
     std::thread rxThread;
 
     std::atomic<bool> running{false};
-    std::atomic<bool> rxRunning{false};
     std::atomic<State> state{State::Idle};
 
     std::string canInterface;
@@ -84,6 +97,7 @@ private:
     std::unique_ptr<ISOTP> isotp;
     std::unique_ptr<UDS_Core> udsCore;
     std::unique_ptr<SAC_Module> sac;
+    std::unique_ptr<SAC_DTC_Module> sacDtc;
 
     std::chrono::steady_clock::time_point lastFrameTime;
     int reconnectAttempts = 0;
@@ -93,8 +107,18 @@ private:
 
     Logger logger;
 
-    enum class CommandType { Connect, Disconnect, Stop };
-    struct Command { CommandType type; };
+    enum class CommandType
+    {
+        Connect,
+        Disconnect,
+        ReadDTC,
+        Stop
+    };
+
+    struct Command
+    {
+        CommandType type;
+    };
 
     std::queue<Command> commandQueue;
     std::mutex queueMutex;

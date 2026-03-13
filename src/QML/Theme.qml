@@ -1,20 +1,19 @@
 import QtQuick
 
 QtObject {
+    readonly property color bgColor: "#F3F3F3"
+    readonly property color cardColor: "#FFFFFF"
 
-    // TŁO
-    readonly property color bgColor: "#F5F5F5"
+    readonly property color buttonColor: "#59C8FF"
+    readonly property color buttonPressed: "#2FA4FF"
+    readonly property color buttonHover: "#7DD6FF"
 
-    // BŁĘKITNY KAFEL (jak Arduino)
-    readonly property color buttonColor: '#2fa4ff'
-    readonly property color buttonPressed: "#1E7EDC"
-    readonly property color buttonHover: "#4DB5FF"
+    readonly property color borderColor: "#2A84C9"
 
-    // RAMKA
-    readonly property color borderColor: "#1B6FBF"
+    readonly property color textColor: "#FFFFFF"
+    readonly property color textColorDark: "#202020"
+    readonly property color textColorMuted: "#606060"
 
-    // TEKST
-    readonly property color textColor: "white"
-    readonly property color textColorPar: "black"
-    readonly property color topBarColor: '#c6d1db'
+    readonly property color topBarColor: "#D4D4D4"
+    readonly property color separatorColor: "#CFCFCF"
 }

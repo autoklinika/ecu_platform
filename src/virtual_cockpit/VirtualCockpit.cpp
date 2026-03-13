@@ -13,26 +13,17 @@ VirtualCockpit::~VirtualCockpit()
 
 void VirtualCockpit::start()
 {
-    if (running)
-        return;
-
+    if(running) return;
     running = true;
-    state = State::Idle;
-
     engineThread = std::thread(&VirtualCockpit::engineLoop, this);
 }
 
 void VirtualCockpit::stop()
 {
-    if (!running)
-        return;
-
+    if(!running) return;
     pushCommand(CommandType::Stop);
-
-    if (engineThread.joinable())
+    if(engineThread.joinable())
         engineThread.join();
-
-    running = false;
 }
 
 VirtualCockpit::State VirtualCockpit::getState() const
@@ -48,7 +39,7 @@ VirtualCockpit::RuntimeData VirtualCockpit::getRuntime() const
 
 bool VirtualCockpit::configureCAN(const std::string& iface, int bitrate)
 {
-    if (state != State::Idle && state != State::Configured)
+    if(state != State::Idle && state != State::Configured)
         return false;
 
     canInterface = iface;
@@ -73,6 +64,11 @@ void VirtualCockpit::disconnect()
     pushCommand(CommandType::Disconnect);
 }
 
+void VirtualCockpit::readDTC()
+{
+    pushCommand(CommandType::ReadDTC);
+}
+
 void VirtualCockpit::pushCommand(CommandType t)
 {
     std::lock_guard<std::mutex> lock(queueMutex);
@@ -86,6 +82,12 @@ void VirtualCockpit::setError(const std::string& msg)
     {
         std::lock_guard<std::mutex> lock(runtimeMutex);
         runtime.lastError = msg;
+        runtime.ecuReady = false;
+
+        runtime.dtcBusy = false;
+        runtime.dtcReady = false;
+        runtime.dtcError = msg;
+        runtime.dtcs.clear();
     }
 
     state = State::Error;
@@ -93,16 +95,13 @@ void VirtualCockpit::setError(const std::string& msg)
 
 void VirtualCockpit::engineLoop()
 {
-    while (running)
+    while(running)
     {
-        auto startTs = steady_clock::now();
-
+        auto start = steady_clock::now();
         processCommands();
         engineTick();
-
-        std::this_thread::sleep_until(startTs + CYCLE_TIME);
+        std::this_thread::sleep_until(start + CYCLE_TIME);
     }
-
     closeStack();
 }
 
@@ -115,6 +114,11 @@ void VirtualCockpit::processCommands()
         runtime.hw.clear();
         runtime.lastError.clear();
         runtime.ecuReady = false;
+
+        runtime.dtcBusy = false;
+        runtime.dtcReady = false;
+        runtime.dtcError.clear();
+        runtime.dtcs.clear();
     };
 
     std::queue<Command> local;
@@ -123,55 +127,93 @@ void VirtualCockpit::processCommands()
         std::swap(local, commandQueue);
     }
 
-    while (!local.empty())
+    while(!local.empty())
     {
         auto cmd = local.front();
         local.pop();
 
-        if (cmd.type == CommandType::Stop)
+        if(cmd.type == CommandType::Stop)
         {
             running = false;
-            state = State::Idle;
         }
-        else if (cmd.type == CommandType::Connect &&
-                 state == State::Configured)
+        else if(cmd.type == CommandType::Connect &&
+                state == State::Configured)
         {
             resetRuntime();
             state = State::Connecting;
 
-            if (openStack())
+            if(openStack())
                 state = State::Connected;
             else
                 setError("Stack open failed");
         }
-        else if (cmd.type == CommandType::Disconnect)
+        else if(cmd.type == CommandType::Disconnect)
         {
+            state = State::Configured;
             closeStack();
             resetRuntime();
-            state = State::Configured;
+        }
+        else if(cmd.type == CommandType::ReadDTC)
+        {
+            if(state != State::Connected || !udsCore)
+                continue;
+
+            if(!runtime.ecuReady)
+                continue;
+
+            if(sacDtc && sacDtc->isBusy())
+                continue;
+
+            {
+                std::lock_guard<std::mutex> lock(runtimeMutex);
+                runtime.dtcBusy = true;
+                runtime.dtcReady = false;
+                runtime.dtcError.clear();
+                runtime.dtcs.clear();
+            }
+
+            sacDtc = std::make_unique<SAC_DTC_Module>(*udsCore);
+            sacDtc->startRead();
         }
     }
 }
 
 void VirtualCockpit::engineTick()
 {
-    if (state == State::Connected)
+    auto resetRuntime = [this]() {
+        std::lock_guard<std::mutex> lock(runtimeMutex);
+        runtime.vin.clear();
+        runtime.sw.clear();
+        runtime.hw.clear();
+        runtime.lastError.clear();
+        runtime.ecuReady = false;
+
+        runtime.dtcBusy = false;
+        runtime.dtcReady = false;
+        runtime.dtcError.clear();
+        runtime.dtcs.clear();
+    };
+
+    if(state == State::Connected)
     {
-        if (duration_cast<milliseconds>(
-                steady_clock::now() - lastFrameTime) > CAN_TIMEOUT)
+        if(duration_cast<milliseconds>(
+            steady_clock::now() - lastFrameTime) > CAN_TIMEOUT)
         {
             logger.log("CAN timeout -> reconnect");
+            resetRuntime();
             state = State::Reconnecting;
         }
     }
 
-    if (state == State::Reconnecting)
+    if(state == State::Reconnecting)
     {
         closeStack();
 
         std::this_thread::sleep_for(milliseconds(200));
 
-        if (openStack())
+        resetRuntime();
+
+        if(openStack())
         {
             reconnectAttempts = 0;
             state = State::Connected;
@@ -179,63 +221,98 @@ void VirtualCockpit::engineTick()
         else
         {
             reconnectAttempts++;
-            if (reconnectAttempts > 5)
+            if(reconnectAttempts > 5)
                 setError("Reconnect failed");
         }
         return;
     }
 
-    if (state != State::Connected)
+    if(state != State::Connected)
         return;
 
     Frame f;
-    while (frameQueue && frameQueue->tryPop(f))
+    while(frameQueue && frameQueue->tryPop(f))
     {
         lastFrameTime = steady_clock::now();
         dispatcher->dispatch(f.id, f.data, f.len);
     }
 
-    if (isotp)
-    {
-        for (int i = 0; i < 3; i++)
+    if(isotp)
+        for(int i = 0; i < 3; i++)
             isotp->update();
-    }
 
-    if (udsCore)
+    if(udsCore)
         udsCore->update();
 
-    if (sac)
+    if(sac)
     {
         sac->update();
 
-        if (sac->isReady())
+        if(sac->isReady())
         {
             auto vin = sac->getVIN();
-            if (vin.size() == 17)
+            if(vin.size() == 17)
             {
                 std::lock_guard<std::mutex> lock(runtimeMutex);
                 runtime.vin = vin;
                 runtime.sw = sac->getSW();
                 runtime.hw = sac->getHW();
                 runtime.ecuReady = true;
+                runtime.lastError.clear();
             }
             sac.reset();
         }
-        else if (sac->hasError())
+        else if(sac->hasError())
         {
             setError("SAC identification failed");
             sac.reset();
+        }
+    }
+
+    if(sacDtc)
+    {
+        sacDtc->update();
+
+        if(sacDtc->isDone())
+        {
+            auto dtcs = sacDtc->getDTCs();
+
+            std::lock_guard<std::mutex> lock(runtimeMutex);
+            runtime.dtcs.clear();
+            runtime.dtcs.reserve(dtcs.size());
+
+            for (const auto& d : dtcs)
+            {
+                DTCRecord rec;
+                rec.code = d.code;
+                rec.status = d.status;
+                runtime.dtcs.push_back(rec);
+            }
+
+            runtime.dtcBusy = false;
+            runtime.dtcReady = true;
+            runtime.dtcError.clear();
+
+            sacDtc.reset();
+        }
+        else if(sacDtc->hasError())
+        {
+            std::lock_guard<std::mutex> lock(runtimeMutex);
+            runtime.dtcBusy = false;
+            runtime.dtcReady = false;
+            runtime.dtcError = sacDtc->getError();
+            runtime.dtcs.clear();
+
+            sacDtc.reset();
         }
     }
 }
 
 bool VirtualCockpit::openStack()
 {
-    closeStack();
-
     transport = std::make_unique<Transport_CAN_Linux>();
 
-    if (!transport->open(canInterface, canBitrate))
+    if(!transport->open(canInterface, canBitrate))
         return false;
 
     frameQueue = std::make_unique<FrameQueue>();
@@ -249,70 +326,55 @@ bool VirtualCockpit::openStack()
 
     dispatcher->registerHandler(isotp.get());
 
-    if (selectedECU == "SAC")
+    if(selectedECU == "SAC")
     {
         sac = std::make_unique<SAC_Module>(*udsCore);
         sac->startIdentification();
     }
 
     lastFrameTime = std::chrono::steady_clock::now();
-    rxRunning = true;
-    rxThread = std::thread(&VirtualCockpit::rxLoop, this);
 
-    logger.log("Stack opened");
+    rxThread = std::thread(&VirtualCockpit::rxLoop, this);
 
     return true;
 }
 
 void VirtualCockpit::closeStack()
 {
-    rxRunning = false;
-
-    if (transport)
+    if(transport)
+    {
         transport->close();
+        transport.reset();
+    }
 
-    if (rxThread.joinable())
+    if(rxThread.joinable())
         rxThread.join();
 
+    sacDtc.reset();
     sac.reset();
     udsCore.reset();
     isotp.reset();
     dispatcher.reset();
     frameQueue.reset();
-
-    if (transport)
-    {
-        transport.reset();
-    }
-
-    logger.log("Stack closed");
 }
 
 void VirtualCockpit::rxLoop()
 {
-    logger.log("RX thread started");
-
-    while (running && rxRunning)
+    while(running && state == State::Connected)
     {
-        uint32_t id = 0;
-        uint8_t data[8] = {};
-        uint8_t len = 0;
+        uint32_t id;
+        uint8_t data[8];
+        uint8_t len;
 
-        if (transport && transport->receiveFrame(id, data, len))
+        if(transport && transport->receiveFrame(id, data, len))
         {
             Frame f{};
             f.id = id;
             f.len = len;
             std::memcpy(f.data, data, len);
 
-            if (frameQueue)
+            if(frameQueue)
                 frameQueue->push(f);
         }
-        else
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
     }
-
-    logger.log("RX thread stopped");
 }

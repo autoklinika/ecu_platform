@@ -31,6 +31,7 @@ qt_add_executable(ecu_app
     src/uds/UDS_Core.cpp
     src/virtual_cockpit/VirtualCockpit.cpp
     src/ecu/sac/SAC_Module.cpp
+    src/ecu/sac/SAC_DTC_Module.cpp
 
     # ---- QT BRIDGE ----
     src/QT_Bridge/CockpitController.cpp

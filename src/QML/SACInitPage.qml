@@ -3,6 +3,7 @@ import QtQuick.Controls
 import ecu_gui 1.0
 
 Item {
+    anchors.fill: parent
 
     property int speed: 250
     property string canInterface: "can0"
@@ -12,25 +13,32 @@ Item {
     property bool canPrepared: false
     property int elapsedMs: 0
 
+    Theme { id: theme }
+
     Column {
-        anchors.centerIn: parent
-        spacing: 40
+        width: parent.width
+        anchors.top: parent.top
+        anchors.topMargin: 40
+        spacing: 28
 
         Text {
-            text: "Connecting to ECU..."
-            font.pixelSize: 36
+            text: "CONNECTING TO ECU..."
+            anchors.horizontalCenter: parent.horizontalCenter
+            font.pixelSize: 40
             font.bold: true
-            color: "#2A2A2A"
+            color: theme.textColorDark
         }
 
         Text {
             text: speed + " kbps"
+            anchors.horizontalCenter: parent.horizontalCenter
             font.pixelSize: 28
-            color: "#666666"
+            color: theme.textColorMuted
         }
 
         BusyIndicator {
-            running: true
+            anchors.horizontalCenter: parent.horizontalCenter
+            running: !connectionError
             width: 60
             height: 60
         }
@@ -38,20 +46,24 @@ Item {
         Text {
             visible: connectionError
             text: "Connection failed"
+            anchors.horizontalCenter: parent.horizontalCenter
             color: "red"
-            font.pixelSize: 22
+            font.pixelSize: 24
         }
+    }
 
-        StyledButton {
-            visible: connectionError
-            width: 240
-            height: 90
-            text: LanguageManager.t("kafelek_back")
-            onClicked: {
-                CockpitController.disconnect()
-                SystemController.resetCAN(canInterface)
-                Navigation.pop()
-            }
+    StyledButton {
+        visible: connectionError
+        width: 240
+        height: 90
+        text: LanguageManager.t("kafelek_back")
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 40
+        onClicked: {
+            CockpitController.disconnect()
+            SystemController.resetCAN(canInterface)
+            Navigation.pop()
         }
     }
 

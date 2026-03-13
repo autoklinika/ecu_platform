@@ -7,7 +7,7 @@ ApplicationWindow {
     width: 1280
     height: 720
     visible: true
-    //visibility: Window.FullScreen
+    visibility: Window.FullScreen
     flags: Qt.FramelessWindowHint
     title: "ECU Tester"
 

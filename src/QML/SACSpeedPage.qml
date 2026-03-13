@@ -3,40 +3,41 @@ import QtQuick.Controls
 import ecu_gui 1.0
 
 Item {
+    anchors.fill: parent
 
-    property int btnW: 360
-    property int btnH: 160
-    property int gapX: 120
+    Theme { id: theme }
 
-    property int totalW: btnW * 2 + gapX
-    property int startX: (width - totalW) / 2
-    property int startY: (height - btnH) / 2
+    Column {
+        width: parent.width
+        anchors.top: parent.top
+        anchors.topMargin: 28
+        spacing: 38
 
-    // 250 kbps
-    StyledButton {
-        width: btnW
-        height: btnH
-        x: startX
-        y: startY
-        text: LanguageManager.t("kafelek_can_250")
-
-        onClicked: {
-            // docelowo: start CAN 250
-            Navigation.push("SACInitPage.qml", { speed: 250 })
+        Text {
+            text: "SAC CAN SPEED"
+            anchors.horizontalCenter: parent.horizontalCenter
+            font.pixelSize: 40
+            font.bold: true
+            color: theme.textColorDark
         }
-    }
 
-    // 500 kbps
-    StyledButton {
-        width: btnW
-        height: btnH
-        x: startX + btnW + gapX
-        y: startY
-        text: LanguageManager.t("kafelek_can_500")
+        Row {
+            anchors.horizontalCenter: parent.horizontalCenter
+            spacing: 80
 
-        onClicked: {
-            // docelowo: start CAN 500
-            Navigation.push("SACInitPage.qml", { speed: 500 })
+            StyledButton {
+                width: 360
+                height: 160
+                text: LanguageManager.t("kafelek_can_250")
+                onClicked: Navigation.push("SACInitPage.qml", { speed: 250 })
+            }
+
+            StyledButton {
+                width: 360
+                height: 160
+                text: LanguageManager.t("kafelek_can_500")
+                onClicked: Navigation.push("SACInitPage.qml", { speed: 500 })
+            }
         }
     }
 
