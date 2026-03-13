@@ -34,14 +34,14 @@ Item {
                 spacing: 18
 
                 Text {
-                    text: "Version: 0.1"
+                    text: "Version: 1.0"
                     font.pixelSize: 28
                     color: theme.textColorMuted
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
                 Text {
-                    text: "Diagnostic / Bench GUI"
+                    text: "New Gui"
                     font.pixelSize: 24
                     color: theme.textColorMuted
                     anchors.horizontalCenter: parent.horizontalCenter

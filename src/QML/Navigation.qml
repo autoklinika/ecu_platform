@@ -3,7 +3,6 @@ import QtQuick
 import QtQuick.Controls
 
 QtObject {
-
     property StackView stack
 
     function push(page, props) {
@@ -19,5 +18,17 @@ QtObject {
     function pop() {
         if (stack)
             stack.pop()
+    }
+
+    function popToRoot() {
+        if (!stack)
+            return
+
+        while (stack.depth > 1)
+            stack.pop()
+    }
+
+    function goHome() {
+        popToRoot()
     }
 }

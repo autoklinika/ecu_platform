@@ -17,42 +17,42 @@ Item {
 
     SACTopBar {
         id: topBar
-        width: parent.width
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
         height: 96
         onMenuClicked: root.modalOpen = !root.modalOpen
     }
 
-    Column {
+    Item {
+        id: contentArea
         anchors.top: topBar.bottom
-        anchors.topMargin: 24
-        anchors.horizontalCenter: parent.horizontalCenter
-        spacing: 18
-
-        Text {
-            text: "PARAMETERS"
-            anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: 34
-            font.bold: true
-            color: theme.textColorDark
-        }
+        anchors.bottom: bottomButtons.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.leftMargin: 24
+        anchors.rightMargin: 24
+        anchors.topMargin: 0
+        anchors.bottomMargin: 16
 
         Rectangle {
             width: 980
             height: 420
+            anchors.centerIn: parent
             radius: 20
             color: theme.cardColor
             border.color: theme.separatorColor
 
             Column {
-                anchors.fill: parent
-                anchors.margins: 24
+                anchors.centerIn: parent
+                width: parent.width - 60
                 spacing: 18
 
                 Repeater {
                     model: 6
 
                     Row {
-                        width: 920
+                        width: parent.width
                         spacing: 260
 
                         Text {
@@ -76,6 +76,7 @@ Item {
     }
 
     Row {
+        id: bottomButtons
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 28
         anchors.horizontalCenter: parent.horizontalCenter
@@ -102,7 +103,7 @@ Item {
         color: "white"
         border.color: theme.borderColor
         x: 32
-        y: 112
+        y: topBar.height + 16
 
         Column {
             anchors.centerIn: parent
@@ -132,7 +133,7 @@ Item {
                     root.modalOpen = false
                     CockpitController.disconnect()
                     SystemController.resetCAN("can0")
-                    Navigation.push("MainMenu.qml")
+                    Navigation.goHome()
                 }
             }
         }

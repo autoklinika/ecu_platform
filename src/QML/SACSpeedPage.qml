@@ -13,13 +13,7 @@ Item {
         anchors.topMargin: 28
         spacing: 38
 
-        Text {
-            text: "SAC CAN SPEED"
-            anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: 40
-            font.bold: true
-            color: theme.textColorDark
-        }
+       
 
         Row {
             anchors.horizontalCenter: parent.horizontalCenter
