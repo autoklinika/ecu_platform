@@ -35,6 +35,7 @@ public:
     void connect();
     void disconnect();
     void readDTC();
+    void clearDTC();
 
     void setRuntimePollingEnabled(bool enabled);
 
@@ -129,6 +130,7 @@ private:
         Connect,
         Disconnect,
         ReadDTC,
+        ClearDTC,
         Stop
     };
 

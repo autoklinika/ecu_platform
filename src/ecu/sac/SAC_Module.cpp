@@ -1,138 +1,172 @@
-#include "SAC_Module.h"
+#include "ecu/sac/SAC_Module.h"
 
 SAC_Module::SAC_Module(UDS_Core& core)
-    : uds(core)
+    : core_(core)
 {
 }
 
 void SAC_Module::startIdentification()
 {
-    vin.clear();
-    sw.clear();
-    hw.clear();
+    vin_.clear();
+    sw_.clear();
+    hw_.clear();
+    error_.clear();
 
-    state = State::RequestSession;
+    core_.reset();
+    step_ = Step::RequestVIN;
+}
+
+void SAC_Module::fail(const std::string& msg)
+{
+    error_ = msg;
+    step_ = Step::Error;
+}
+
+bool SAC_Module::parseDidStringResponse(const std::vector<uint8_t>& resp,
+                                        uint16_t expectedDid,
+                                        std::string& out)
+{
+    if (resp.size() < 3)
+        return false;
+
+    if (resp[0] != 0x62)
+        return false;
+
+    const uint16_t did =
+        (static_cast<uint16_t>(resp[1]) << 8) |
+        static_cast<uint16_t>(resp[2]);
+
+    if (did != expectedDid)
+        return false;
+
+    out.assign(resp.begin() + 3, resp.end());
+    return true;
 }
 
 void SAC_Module::update()
 {
-    if (state == State::Idle ||
-        state == State::Done ||
-        state == State::Error)
+    switch (step_)
+    {
+    case Step::Idle:
+    case Step::Done:
+    case Step::Error:
         return;
 
-    switch (state)
-    {
-    // ==========================
-    // 1️⃣ Extended Session
-    // ==========================
-    case State::RequestSession:
-        if (uds.request({0x10, 0x03}))
-            state = State::WaitSession;
-        else
-            state = State::Error;
-        break;
+    case Step::RequestVIN:
+        if (!core_.isIdle())
+            return;
 
-    case State::WaitSession:
-        if (uds.getState() == UDS_Core::State::Done)
+        if (core_.request({0x22, 0xF1, 0x90}))
+            step_ = Step::WaitVIN;
+        else
+            fail("Cannot send VIN request");
+        return;
+
+    case Step::WaitVIN:
+        if (core_.getState() == UDS_Core::State::Done)
         {
-            auto resp = uds.getResponse();
+            const auto resp = core_.getResponse();
+            core_.reset();
 
-            if (resp.size() >= 2 && resp[0] == 0x50)
-                state = State::RequestVIN;
+            if (parseDidStringResponse(resp, 0xF190, vin_))
+                step_ = Step::RequestSW;
             else
-                state = State::Error;
+                fail("Invalid VIN response");
         }
-        break;
-
-    // ==========================
-    // 2️⃣ VIN
-    // ==========================
-    case State::RequestVIN:
-        if (uds.request({0x22, 0xF1, 0x90}))
-            state = State::WaitVIN;
-        else
-            state = State::Error;
-        break;
-
-    case State::WaitVIN:
-        if (uds.getState() == UDS_Core::State::Done)
+        else if (core_.getState() == UDS_Core::State::Error ||
+                 core_.getState() == UDS_Core::State::Timeout)
         {
-            auto resp = uds.getResponse();
-
-            if (resp.size() > 3 && resp[0] == 0x62)
-            {
-                vin.assign(resp.begin() + 3, resp.end());
-                state = State::RequestSW;
-            }
-            else
-                state = State::Error;
+            core_.reset();
+            fail("VIN read timeout/error");
         }
-        break;
+        return;
 
-    // ==========================
-    // 3️⃣ SW
-    // ==========================
-    case State::RequestSW:
-        if (uds.request({0x22, 0xF1, 0x88}))
-            state = State::WaitSW;
+    case Step::RequestSW:
+        if (!core_.isIdle())
+            return;
+
+        if (core_.request({0x22, 0xF1, 0x88}))
+            step_ = Step::WaitSW;
         else
-            state = State::Error;
-        break;
+            fail("Cannot send SW request");
+        return;
 
-    case State::WaitSW:
-        if (uds.getState() == UDS_Core::State::Done)
-        {  
-            auto resp = uds.getResponse();
-
-            if (resp.size() > 3 && resp[0] == 0x62)
-            {
-                sw.assign(resp.begin() + 3, resp.end());
-                state = State::RequestHW;
-            }
-            else
-                state = State::Error;
-        }
-        break;
-
-    // ==========================
-    // 4️⃣ HW
-    // ==========================
-    case State::RequestHW:
-        if (uds.request({0x22, 0xF1, 0x92}))
-            state = State::WaitHW;
-        else
-            state = State::Error;
-        break;
-
-    case State::WaitHW:
-    
-        if (uds.getState() == UDS_Core::State::Done)
+    case Step::WaitSW:
+        if (core_.getState() == UDS_Core::State::Done)
         {
-            auto resp = uds.getResponse();
-            
-            if (resp.size() > 3 && resp[0] == 0x62)
-            {
-                hw.assign(resp.begin() + 3, resp.end());
-                state = State::Done;
-            }
+            const auto resp = core_.getResponse();
+            core_.reset();
+
+            if (parseDidStringResponse(resp, 0xF188, sw_))
+                step_ = Step::RequestHW;
             else
-                state = State::Error;
+                fail("Invalid SW response");
         }
-        break;
+        else if (core_.getState() == UDS_Core::State::Error ||
+                 core_.getState() == UDS_Core::State::Timeout)
+        {
+            core_.reset();
+            fail("SW read timeout/error");
+        }
+        return;
+
+    case Step::RequestHW:
+        if (!core_.isIdle())
+            return;
+
+        if (core_.request({0x22, 0xF1, 0x92}))
+            step_ = Step::WaitHW;
+        else
+            fail("Cannot send HW request");
+        return;
+
+    case Step::WaitHW:
+        if (core_.getState() == UDS_Core::State::Done)
+        {
+            const auto resp = core_.getResponse();
+            core_.reset();
+
+            if (parseDidStringResponse(resp, 0xF192, hw_))
+                step_ = Step::Done;
+            else
+                fail("Invalid HW response");
+        }
+        else if (core_.getState() == UDS_Core::State::Error ||
+                 core_.getState() == UDS_Core::State::Timeout)
+        {
+            core_.reset();
+            fail("HW read timeout/error");
+        }
+        return;
     }
 }
 
 bool SAC_Module::isReady() const
 {
-    return state == State::Done;
+    return step_ == Step::Done;
 }
 
 bool SAC_Module::hasError() const
 {
-    return state == State::Error;
+    return step_ == Step::Error;
 }
 
-std::string SAC_Module::getVIN() const { return vin; }
-std::string SAC_Module::getSW()  const { return sw;  }
-std::string SAC_Module::getHW()  const { return hw;  }
+std::string SAC_Module::getVIN() const
+{
+    return vin_;
+}
+
+std::string SAC_Module::getSW() const
+{
+    return sw_;
+}
+
+std::string SAC_Module::getHW() const
+{
+    return hw_;
+}
+
+std::string SAC_Module::getError() const
+{
+    return error_;
+}

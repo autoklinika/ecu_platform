@@ -9,6 +9,7 @@ Item {
 
     property bool online: CockpitController.connected
     property string vin: CockpitController.vin
+    property string leftButtonText: LanguageManager.t("kafelek_menu")
 
     signal menuClicked()
 
@@ -25,11 +26,11 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         width: 192
         height: 64
-        text: LanguageManager.t("kafelek_menu")
+        text: root.leftButtonText
         onClicked: root.menuClicked()
     }
 
-    
+ 
 
     Row {
         anchors.horizontalCenter: parent.horizontalCenter

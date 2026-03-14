@@ -191,6 +191,21 @@ void CockpitController::startDTCRead()
     engine.readDTC();
 }
 
+void CockpitController::clearDTC()
+{
+    m_dtcList.clear();
+    m_dtcBusy = true;
+    m_dtcReady = false;
+    m_dtcError.clear();
+
+    emit dtcListChanged();
+    emit dtcBusyChanged();
+    emit dtcReadyChanged();
+    emit dtcErrorChanged();
+
+    engine.clearDTC();
+}
+
 void CockpitController::poll()
 {
     auto data = engine.getRuntime();

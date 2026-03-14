@@ -38,6 +38,7 @@ public:
     Q_INVOKABLE QString readVIN() const;
     Q_INVOKABLE void setRuntimePollingEnabled(bool enabled);
     Q_INVOKABLE void startDTCRead();
+    Q_INVOKABLE void clearDTC();
 
     QString vin() const { return m_vin; }
     QString sw() const { return m_sw; }

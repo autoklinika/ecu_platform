@@ -1,54 +1,51 @@
 #pragma once
 
-#include "IECU_Module.h"
 #include "uds/UDS_Core.h"
-
 #include <string>
+#include <vector>
+#include <cstdint>
 
-class SAC_Module : public IECU_Module
+class SAC_Module
 {
 public:
     explicit SAC_Module(UDS_Core& core);
 
-    void startIdentification() override;
-    void update() override;
+    void startIdentification();
+    void update();
 
-    bool isReady() const override;
-    bool hasError() const override;
+    bool isReady() const;
+    bool hasError() const;
 
-    std::string getVIN() const override;
-    std::string getSW()  const override;
-    std::string getHW()  const override;
+    std::string getVIN() const;
+    std::string getSW() const;
+    std::string getHW() const;
+    std::string getError() const;
 
 private:
+    enum class Step
+    {
+        Idle,
+        RequestVIN,
+        WaitVIN,
+        RequestSW,
+        WaitSW,
+        RequestHW,
+        WaitHW,
+        Done,
+        Error
+    };
 
-    enum class State
-{
-    Idle,
+    bool parseDidStringResponse(const std::vector<uint8_t>& resp,
+                                uint16_t expectedDid,
+                                std::string& out);
+    void fail(const std::string& msg);
 
-    RequestSession,
-    WaitSession,
+private:
+    UDS_Core& core_;
+    Step step_ = Step::Idle;
 
-    RequestVIN,
-    WaitVIN,
-
-    RequestSW,
-    WaitSW,
-
-    RequestHW,
-    WaitHW,
-
-    Done,
-    Error
-};
-
-    UDS_Core& uds;
-    State state = State::Idle;
-
-    std::string vin;
-    std::string sw;
-    std::string hw;
-
-    void requestDID(uint16_t did);
-    void processResponse(uint16_t expectedDid);
+    std::string vin_;
+    std::string sw_;
+    std::string hw_;
+    std::string error_;
 };

@@ -69,6 +69,11 @@ void VirtualCockpit::readDTC()
     pushCommand(CommandType::ReadDTC);
 }
 
+void VirtualCockpit::clearDTC()
+{
+    pushCommand(CommandType::ClearDTC);
+}
+
 void VirtualCockpit::setRuntimePollingEnabled(bool enabled)
 {
     runtimePollingEnabled = enabled;
@@ -166,7 +171,7 @@ void VirtualCockpit::processCommands()
             closeStack();
             resetRuntime();
         }
-        else if (cmd.type == CommandType::ReadDTC)
+        else if (cmd.type == CommandType::ReadDTC || cmd.type == CommandType::ClearDTC)
         {
             bool ecuReady = false;
             {
@@ -189,7 +194,11 @@ void VirtualCockpit::processCommands()
             }
 
             sacDtc = std::make_unique<SAC_DTC_Module>(*udsCore);
-            sacDtc->startRead();
+
+            if (cmd.type == CommandType::ReadDTC)
+                sacDtc->startRead();
+            else
+                sacDtc->startClear();
         }
     }
 }

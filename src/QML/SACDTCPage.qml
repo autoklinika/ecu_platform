@@ -13,6 +13,11 @@ Item {
         CockpitController.startDTCRead()
     }
 
+    function eraseDTC() {
+        CockpitController.setRuntimePollingEnabled(false)
+        CockpitController.clearDTC()
+    }
+
     Component.onCompleted: startRead()
 
     Component.onDestruction: {
@@ -30,6 +35,7 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         height: 96
+        leftButtonText: LanguageManager.t("kafelek_back")
         onMenuClicked: Navigation.pop()
     }
 
@@ -72,7 +78,7 @@ Item {
                 Text {
                     visible: CockpitController.dtcBusy
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: "Reading DTC in extended session..."
+                    text: "Working in extended session..."
                     font.pixelSize: 22
                     color: theme.textColorMuted
                 }
@@ -256,8 +262,8 @@ Item {
         StyledButton {
             width: 220
             height: 80
-            text: LanguageManager.t("kafelek_back")
-            onClicked: Navigation.pop()
+            text: "ERASE"
+            onClicked: root.eraseDTC()
         }
     }
 }
