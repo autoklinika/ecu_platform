@@ -33,6 +33,7 @@ qt_add_executable(ecu_app
     src/ecu/sac/SAC_Module.cpp
     src/ecu/sac/SAC_DTC_Module.cpp
     src/ecu/sac/SAC_Runtime_Module.cpp
+    src/scanner/CANScannerEngine.cpp
 
 
     # ---- QT BRIDGE ----

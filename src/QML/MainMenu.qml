@@ -39,6 +39,7 @@ Item {
         height: btnH
         x: startX
         y: startY + btnH + gapY
+         onClicked: Navigation.push("CANScannerMenuPage.qml")
     }
 
     StyledButton {

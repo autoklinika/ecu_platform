@@ -445,6 +445,150 @@ build/.rcc/qmlcache/ecu_app_src/QML/BrandPage_qml.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/build/.rcc/qmlcache/ecu_app_src/QML/BrandPage_qml.cpp.s
 .PHONY : build/.rcc/qmlcache/ecu_app_src/QML/BrandPage_qml.cpp.s
 
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.o: build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.cpp.o
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.o
+
+# target to build an object file
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.cpp.o
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.cpp.o
+
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.i: build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.cpp.i
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.i
+
+# target to preprocess a source file
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.cpp.i
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.cpp.i
+
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.s: build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.cpp.s
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.s
+
+# target to generate assembly for a file
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.cpp.s
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.cpp.s
+
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.o: build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.cpp.o
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.o
+
+# target to build an object file
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.cpp.o
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.cpp.o
+
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.i: build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.cpp.i
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.i
+
+# target to preprocess a source file
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.cpp.i
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.cpp.i
+
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.s: build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.cpp.s
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.s
+
+# target to generate assembly for a file
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.cpp.s
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.cpp.s
+
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.o: build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.cpp.o
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.o
+
+# target to build an object file
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.cpp.o
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.cpp.o
+
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.i: build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.cpp.i
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.i
+
+# target to preprocess a source file
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.cpp.i
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.cpp.i
+
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.s: build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.cpp.s
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.s
+
+# target to generate assembly for a file
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.cpp.s
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.cpp.s
+
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.o: build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.cpp.o
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.o
+
+# target to build an object file
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.cpp.o
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.cpp.o
+
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.i: build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.cpp.i
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.i
+
+# target to preprocess a source file
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.cpp.i
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.cpp.i
+
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.s: build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.cpp.s
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.s
+
+# target to generate assembly for a file
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.cpp.s
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.cpp.s
+
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.o: build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.cpp.o
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.o
+
+# target to build an object file
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.cpp.o
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.cpp.o
+
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.i: build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.cpp.i
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.i
+
+# target to preprocess a source file
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.cpp.i
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.cpp.i
+
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.s: build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.cpp.s
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.s
+
+# target to generate assembly for a file
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.cpp.s
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.cpp.s
+
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.o: build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.cpp.o
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.o
+
+# target to build an object file
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.cpp.o
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.cpp.o
+
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.i: build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.cpp.i
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.i
+
+# target to preprocess a source file
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.cpp.i
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.cpp.i
+
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.s: build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.cpp.s
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.s
+
+# target to generate assembly for a file
+build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.cpp.s
+.PHONY : build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.cpp.s
+
 build/.rcc/qmlcache/ecu_app_src/QML/InfoPage_qml.o: build/.rcc/qmlcache/ecu_app_src/QML/InfoPage_qml.cpp.o
 .PHONY : build/.rcc/qmlcache/ecu_app_src/QML/InfoPage_qml.o
 
@@ -1069,6 +1213,30 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/scanner/CANScannerEngine.o: src/scanner/CANScannerEngine.cpp.o
+.PHONY : src/scanner/CANScannerEngine.o
+
+# target to build an object file
+src/scanner/CANScannerEngine.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/src/scanner/CANScannerEngine.cpp.o
+.PHONY : src/scanner/CANScannerEngine.cpp.o
+
+src/scanner/CANScannerEngine.i: src/scanner/CANScannerEngine.cpp.i
+.PHONY : src/scanner/CANScannerEngine.i
+
+# target to preprocess a source file
+src/scanner/CANScannerEngine.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/src/scanner/CANScannerEngine.cpp.i
+.PHONY : src/scanner/CANScannerEngine.cpp.i
+
+src/scanner/CANScannerEngine.s: src/scanner/CANScannerEngine.cpp.s
+.PHONY : src/scanner/CANScannerEngine.s
+
+# target to generate assembly for a file
+src/scanner/CANScannerEngine.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ecu_app.dir/build.make CMakeFiles/ecu_app.dir/src/scanner/CANScannerEngine.cpp.s
+.PHONY : src/scanner/CANScannerEngine.cpp.s
+
 src/system/SystemController.o: src/system/SystemController.cpp.o
 .PHONY : src/system/SystemController.o
 
@@ -1228,6 +1396,24 @@ help:
 	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/BrandPage_qml.o"
 	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/BrandPage_qml.i"
 	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/BrandPage_qml.s"
+	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.o"
+	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.i"
+	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/CANScannerBitratePage_qml.s"
+	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.o"
+	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.i"
+	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/CANScannerECUPage_qml.s"
+	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.o"
+	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.i"
+	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/CANScannerLogPage_qml.s"
+	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.o"
+	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.i"
+	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/CANScannerMenuPage_qml.s"
+	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.o"
+	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.i"
+	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/CANScannerParametersPage_qml.s"
+	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.o"
+	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.i"
+	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/CANScannerTopBar_qml.s"
 	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/InfoPage_qml.o"
 	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/InfoPage_qml.i"
 	@echo "... build/.rcc/qmlcache/ecu_app_src/QML/InfoPage_qml.s"
@@ -1306,6 +1492,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/scanner/CANScannerEngine.o"
+	@echo "... src/scanner/CANScannerEngine.i"
+	@echo "... src/scanner/CANScannerEngine.s"
 	@echo "... src/system/SystemController.o"
 	@echo "... src/system/SystemController.i"
 	@echo "... src/system/SystemController.s"
