@@ -9,7 +9,23 @@ Item {
     Theme { id: theme }
 
     function startScan() {
-        CANScanner.scanBitrate("can0", "auto", 241, 800, true)
+        CANScanner.scanBitrate(
+                    CANScanner.bitrateInterface,
+                    CANScanner.bitrateDetectMode,
+                    CANScanner.bitrateTesterSa,
+                    CANScanner.bitrateListenMs,
+                    CANScanner.bitrateExtendedOnly
+                    )
+    }
+
+    function hex2(v) {
+        var n = Number(v)
+        if (isNaN(n))
+            n = 0
+        var s = n.toString(16).toUpperCase()
+        if (s.length < 2)
+            s = "0" + s
+        return "0x" + s
     }
 
     property string resultText: {
@@ -37,20 +53,9 @@ Item {
         color: theme.bgColor
     }
 
-    CANScannerTopBar {
-        id: topBar
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        titleText: "BITRATE SCAN"
-        leftButtonText: "BACK"
-        rightText: CANScanner.status
-        onMenuClicked: Navigation.pop()
-    }
-
     Rectangle {
         id: mainPanel
-        anchors.top: topBar.bottom
+        anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: buttonsRow.top
@@ -69,7 +74,7 @@ Item {
             Text {
                 text: "BITRATE SCANNER"
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pixelSize: 26
+                font.pixelSize: 28
                 font.bold: true
                 color: theme.textColorDark
             }
@@ -83,7 +88,7 @@ Item {
 
             Rectangle {
                 width: parent.width
-                height: 120
+                height: 128
                 radius: 14
                 color: "#FFFFFF"
                 border.color: theme.separatorColor
@@ -103,7 +108,7 @@ Item {
                     Text {
                         text: root.resultText
                         anchors.horizontalCenter: parent.horizontalCenter
-                        font.pixelSize: 34
+                        font.pixelSize: 36
                         font.bold: true
                         color: root.resultColor
                     }
@@ -127,7 +132,7 @@ Item {
 
             Rectangle {
                 width: parent.width
-                height: 96
+                height: 100
                 radius: 14
                 color: "#FFFFFF"
                 border.color: theme.separatorColor
@@ -170,7 +175,7 @@ Item {
 
             Rectangle {
                 width: parent.width
-                height: 58
+                height: 60
                 radius: 12
                 color: CANScanner.detectedBitrate !== "" ? "#ECFDF3"
                                                          : (CANScanner.status === "Nie wykryto bitrate" ? "#FFF1F2" : "#F8F8F8")
@@ -194,6 +199,45 @@ Item {
                     color: root.resultColor
                 }
             }
+
+            Rectangle {
+                width: parent.width
+                height: 96
+                radius: 14
+                color: "#FFFFFF"
+                border.color: theme.separatorColor
+                border.width: 1
+
+                Column {
+                    anchors.fill: parent
+                    anchors.margins: 14
+                    spacing: 8
+
+                    Text {
+                        text: "ACTIVE PARAMETERS"
+                        font.pixelSize: 18
+                        font.bold: true
+                        color: theme.textColorDark
+                    }
+
+                    Text {
+                        text: "IF: " + CANScanner.bitrateInterface
+                              + "    MODE: " + CANScanner.bitrateDetectMode
+                              + "    SA: " + root.hex2(CANScanner.bitrateTesterSa)
+                        font.pixelSize: 16
+                        color: theme.textColorMuted
+                        wrapMode: Text.WordWrap
+                    }
+
+                    Text {
+                        text: "LISTEN: " + CANScanner.bitrateListenMs + " ms"
+                              + "    EXT ONLY: " + (CANScanner.bitrateExtendedOnly ? "ON" : "OFF")
+                        font.pixelSize: 16
+                        color: theme.textColorMuted
+                        wrapMode: Text.WordWrap
+                    }
+                }
+            }
         }
     }
 
@@ -203,6 +247,13 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottomMargin: 16
         spacing: 16
+
+        StyledButton {
+            width: 150
+            height: 68
+            text: "BACK"
+            onClicked: Navigation.pop()
+        }
 
         StyledButton {
             width: 150
@@ -222,14 +273,14 @@ Item {
         }
 
         StyledButton {
-            width: 150
+            width: 170
             height: 68
             text: "PARAMETERS"
             onClicked: Navigation.push("CANScannerParametersPage.qml")
         }
 
         StyledButton {
-            width: 170
+            width: 190
             height: 68
             text: "LOG / RESULTS"
             onClicked: Navigation.push("CANScannerLogPage.qml")

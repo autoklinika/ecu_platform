@@ -8,33 +8,31 @@ Item {
 
     Theme { id: theme }
 
-    function shortcutItems() {
-        return [
-            { label: "IF", value: ifaceField ? ifaceField.text : "can0" },
-            { label: "BR", value: bitrateField ? bitrateField.text : "250000" },
-            { label: "MODE", value: testerMode ? testerMode.currentText : "manual" },
-            { label: "SA", value: testerSa ? testerSa.text : "241" },
-            { label: "T", value: (testerFrom ? testerFrom.text : "240") + "-" + (testerTo ? testerTo.text : "255") },
-            { label: "ECU", value: (ecuFrom ? ecuFrom.text : "0") + "-" + (ecuTo ? ecuTo.text : "254") },
-            { label: "TO", value: (timeoutMs ? timeoutMs.text : "120") + " ms" }
-        ]
-    }
-
     function scanNow() {
         CANScanner.scanECU(
-            ifaceField.text,
-            parseInt(bitrateField.text),
-            testerMode.currentText,
-            parseInt(testerSa.text),
-            parseInt(testerFrom.text),
-            parseInt(testerTo.text),
-            parseInt(ecuFrom.text),
-            parseInt(ecuTo.text),
-            parseInt(timeoutMs.text),
-            serviceName.currentText,
-            stopFirst.checked,
-            debugRx.checked
-        )
+                    CANScanner.ecuInterface,
+                    CANScanner.ecuBitrate,
+                    CANScanner.ecuTesterMode,
+                    CANScanner.ecuTesterSa,
+                    CANScanner.ecuTesterFrom,
+                    CANScanner.ecuTesterTo,
+                    CANScanner.ecuAddrFrom,
+                    CANScanner.ecuAddrTo,
+                    CANScanner.ecuTimeoutMs,
+                    CANScanner.ecuServiceName,
+                    CANScanner.ecuStopOnFirst,
+                    CANScanner.ecuDebugRx
+                    )
+    }
+
+    function hex2(v) {
+        var n = Number(v)
+        if (isNaN(n))
+            n = 0
+        var s = n.toString(16).toUpperCase()
+        if (s.length < 2)
+            s = "0" + s
+        return "0x" + s
     }
 
     Rectangle {
@@ -42,133 +40,173 @@ Item {
         color: theme.bgColor
     }
 
-    CANScannerTopBar {
-        id: topBar
+    Rectangle {
+        id: mainPanel
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        titleText: "ECU SCAN"
-        rightText: CANScanner.status
-        shortcutModel: root.shortcutItems()
-        onMenuClicked: Navigation.pop()
-    }
-
-    Item {
-        id: contentArea
-        anchors.top: topBar.bottom
         anchors.bottom: bottomBar.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.leftMargin: 24
-        anchors.rightMargin: 24
-        anchors.topMargin: 12
-        anchors.bottomMargin: 16
+        anchors.margins: 16
+        anchors.bottomMargin: 14
+        radius: 18
+        color: theme.cardColor
+        border.color: theme.separatorColor
+        border.width: 1
 
-        Rectangle {
-            id: ecuPanel
+        Column {
             anchors.fill: parent
-            radius: 20
-            color: theme.cardColor
-            border.color: theme.separatorColor
+            anchors.margins: 16
+            spacing: 12
 
-            Column {
-                id: headerColumn
-                anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.leftMargin: 24
-                anchors.rightMargin: 24
-                anchors.topMargin: 24
-                spacing: 14
+            Text {
+                text: "ECU SCANNER"
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pixelSize: 28
+                font.bold: true
+                color: theme.textColorDark
+            }
 
-                Text {
-                    text: "ECU SCANNER"
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.pixelSize: 34
-                    font.bold: true
-                    color: theme.textColorDark
+            Text {
+                text: "Skanowanie adresów ECU i odpowiedzi diagnostycznych"
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pixelSize: 18
+                color: theme.textColorMuted
+            }
+
+            Rectangle {
+                width: parent.width
+                height: 110
+                radius: 14
+                color: "#FFFFFF"
+                border.color: theme.separatorColor
+                border.width: 1
+
+                Column {
+                    anchors.fill: parent
+                    anchors.margins: 14
+                    spacing: 8
+
+                    Text {
+                        text: "PROGRESS"
+                        font.pixelSize: 18
+                        font.bold: true
+                        color: theme.textColorDark
+                    }
+
+                    Rectangle {
+                        width: parent.width
+                        height: 24
+                        radius: 12
+                        color: "#E9E9E9"
+                        border.color: "#D5D5D5"
+
+                        Rectangle {
+                            height: parent.height
+                            radius: parent.radius
+                            width: parent.width * (CANScanner.progressPercent / 100.0)
+                            color: "#1D4ED8"
+                        }
+                    }
+
+                    Text {
+                        text: CANScanner.progressCurrent + " / " + CANScanner.progressTotal + "    " + CANScanner.progressPercent + "%"
+                        font.pixelSize: 16
+                        color: theme.textColorDark
+                    }
                 }
+            }
+
+            Rectangle {
+                width: parent.width
+                height: 64
+                radius: 12
+                color: CANScanner.busy ? "#EEF4FF" : "#F8F8F8"
+                border.color: CANScanner.busy ? "#C9D8FF" : "#DDDDDD"
+                border.width: 1
 
                 Text {
-                    text: "Konfiguracja programu testującego i zakresu skanowania"
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.pixelSize: 22
-                    color: theme.textColorMuted
-                }
-
-                Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: "PROGRESS: " + CANScanner.progressCurrent + " / " + CANScanner.progressTotal + " (" + CANScanner.progressPercent + "%)"
-                    font.pixelSize: 24
+                    anchors.centerIn: parent
+                    text: CANScanner.status === "" ? "Ready to scan" : CANScanner.status
+                    font.pixelSize: 20
                     font.bold: true
                     color: theme.textColorDark
                 }
             }
 
             Rectangle {
-                id: formContainer
-                anchors.top: headerColumn.bottom
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.leftMargin: 24
-                anchors.rightMargin: 24
-                anchors.topMargin: 20
-                anchors.bottomMargin: 24
+                width: parent.width
+                height: 124
                 radius: 14
                 color: "#FFFFFF"
                 border.color: theme.separatorColor
+                border.width: 1
 
-                ListView {
-                    id: settingsList
+                Column {
                     anchors.fill: parent
-                    anchors.margins: 10
-                    clip: true
-                    spacing: 2
-                    model: settingsModel
+                    anchors.margins: 14
+                    spacing: 8
 
-                    delegate: Rectangle {
-                        property var entry: modelData
-                        property string label: entry.label
-                        property string type: entry.type
-                        property string value: entry.value
-                        property var choices: entry.choices
-                        property bool checkedValue: entry.checkedValue
-                        property int fieldWidth: entry.fieldWidth
-                        property string unit: entry.unit
-
-                        width: settingsList.width
-                        height: type === "check" ? 64 : 72
-                        radius: 8
-                        color: index % 2 === 0 ? "#F6F6F6" : "#FFFFFF"
-                        border.color: "#DDDDDD"
-
-                        Text {
-                            anchors.left: parent.left
-                            anchors.leftMargin: 16
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: parent.width * 0.34
-                            text: label
-                            font.pixelSize: 24
-                            color: theme.textColorDark
-                            elide: Text.ElideRight
-                        }
-
-                        Loader {
-                            anchors.right: parent.right
-                            anchors.rightMargin: 16
-                            anchors.verticalCenter: parent.verticalCenter
-                            sourceComponent: {
-                                if (type === "combo") return comboEditor
-                                if (type === "range") return rangeEditor
-                                if (type === "service") return serviceEditor
-                                if (type === "check") return checkEditor
-                                return textEditor
-                            }
-                        }
+                    Text {
+                        text: "ACTIVE SERVICE"
+                        font.pixelSize: 18
+                        font.bold: true
+                        color: theme.textColorDark
                     }
 
-                    ScrollBar.vertical: ScrollBar { active: true }
+                    Text {
+                        text: CANScanner.ecuServiceName
+                        font.pixelSize: 18
+                        color: theme.textColorDark
+                        wrapMode: Text.WordWrap
+                    }
+
+                    Text {
+                        text: "STOP FIRST: " + (CANScanner.ecuStopOnFirst ? "ON" : "OFF")
+                              + "    DEBUG RX: " + (CANScanner.ecuDebugRx ? "ON" : "OFF")
+                        font.pixelSize: 16
+                        color: theme.textColorMuted
+                    }
+                }
+            }
+
+            Rectangle {
+                width: parent.width
+                height: 128
+                radius: 14
+                color: "#FFFFFF"
+                border.color: theme.separatorColor
+                border.width: 1
+
+                Column {
+                    anchors.fill: parent
+                    anchors.margins: 14
+                    spacing: 8
+
+                    Text {
+                        text: "ACTIVE PARAMETERS"
+                        font.pixelSize: 18
+                        font.bold: true
+                        color: theme.textColorDark
+                    }
+
+                    Text {
+                        text: "IF: " + CANScanner.ecuInterface
+                              + "    BR: " + CANScanner.ecuBitrate
+                              + "    MODE: " + CANScanner.ecuTesterMode
+                              + "    SA: " + root.hex2(CANScanner.ecuTesterSa)
+                        font.pixelSize: 16
+                        color: theme.textColorMuted
+                        wrapMode: Text.WordWrap
+                    }
+
+                    Text {
+                        text: "T: " + root.hex2(CANScanner.ecuTesterFrom) + "-" + root.hex2(CANScanner.ecuTesterTo)
+                              + "    ECU: " + root.hex2(CANScanner.ecuAddrFrom) + "-" + root.hex2(CANScanner.ecuAddrTo)
+                              + "    TO: " + CANScanner.ecuTimeoutMs + " ms"
+                        font.pixelSize: 16
+                        color: theme.textColorMuted
+                        wrapMode: Text.WordWrap
+                    }
                 }
             }
         }
@@ -176,161 +214,54 @@ Item {
 
     Row {
         id: bottomBar
-        spacing: 24
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 28
         anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottomMargin: 16
+        spacing: 16
 
         StyledButton {
-            width: 240
-            height: 80
-            text: "START"
-            onClicked: root.scanNow()
+            width: 150
+            height: 68
+            text: "BACK"
+            onClicked: Navigation.pop()
         }
 
         StyledButton {
-            width: 240
-            height: 80
+            width: 150
+            height: 68
+            text: CANScanner.busy ? "SCANNING..." : "START"
+            onClicked: {
+                if (!CANScanner.busy)
+                    root.scanNow()
+            }
+        }
+
+        StyledButton {
+            width: 150
+            height: 68
+            text: "STOP"
+            onClicked: CANScanner.stopScan()
+        }
+
+        StyledButton {
+            width: 170
+            height: 68
+            text: "PARAMETERS"
+            onClicked: Navigation.push("CANScannerECUParametersPage.qml")
+        }
+
+        StyledButton {
+            width: 170
+            height: 68
             text: "CLEAR RESULTS"
             onClicked: CANScanner.clearResults()
         }
 
         StyledButton {
-            width: 220
-            height: 80
+            width: 190
+            height: 68
             text: "LOG / RESULTS"
             onClicked: Navigation.push("CANScannerLogPage.qml")
         }
     }
-
-    property var settingsModel: [
-        { label: "INTERFACE", type: "text", value: "can0", choices: [], checkedValue: false, fieldWidth: 220, unit: "" },
-        { label: "BITRATE [bit/s]", type: "text", value: "250000", choices: [], checkedValue: false, fieldWidth: 220, unit: "" },
-        { label: "TESTER MODE", type: "combo", value: "manual", choices: ["manual", "auto"], checkedValue: false, fieldWidth: 220, unit: "" },
-        { label: "TESTER SA (DEC)", type: "text", value: "241", choices: [], checkedValue: false, fieldWidth: 220, unit: "" },
-        { label: "TESTER RANGE", type: "range", value: "240-255", choices: [], checkedValue: false, fieldWidth: 220, unit: "" },
-        { label: "ECU RANGE", type: "range", value: "0-254", choices: [], checkedValue: false, fieldWidth: 220, unit: "" },
-        { label: "TIMEOUT [ms]", type: "text", value: "120", choices: [], checkedValue: false, fieldWidth: 220, unit: "ms" },
-        { label: "SERVICE", type: "service", value: "TesterPresent (3E 00)", choices: ["TesterPresent (3E 00)", "DiagnosticSessionControl (10 01)", "ReadDataByIdentifier VIN (22 F1 90)"], checkedValue: false, fieldWidth: 420, unit: "" },
-        { label: "STOP ON FIRST RESPONSE", type: "check", value: "", choices: [], checkedValue: true, fieldWidth: 220, unit: "" },
-        { label: "DEBUG RX", type: "check", value: "", choices: [], checkedValue: true, fieldWidth: 220, unit: "" }
-    ]
-
-    Component {
-        id: textEditor
-        TextField {
-            width: fieldWidth
-            height: 46
-            font.pixelSize: 22
-            text: value
-
-            Component.onCompleted: {
-                if (label === "INTERFACE") ifaceField = this
-                else if (label === "BITRATE [bit/s]") bitrateField = this
-                else if (label === "TESTER SA (DEC)") testerSa = this
-                else if (label === "TIMEOUT [ms]") timeoutMs = this
-            }
-        }
-    }
-
-    Component {
-        id: comboEditor
-        ComboBox {
-            width: fieldWidth
-            height: 46
-            font.pixelSize: 22
-            model: choices
-
-            Component.onCompleted: {
-                currentIndex = Math.max(0, find(value))
-                if (label === "TESTER MODE") testerMode = this
-            }
-        }
-    }
-
-    Component {
-        id: rangeEditor
-        Row {
-            spacing: 10
-
-            TextField {
-                id: fromField
-                width: 100
-                height: 46
-                font.pixelSize: 22
-                text: value.split("-")[0]
-
-                Component.onCompleted: {
-                    if (label === "TESTER RANGE") testerFrom = this
-                    else if (label === "ECU RANGE") ecuFrom = this
-                }
-            }
-
-            Text {
-                text: "-"
-                font.pixelSize: 24
-                color: theme.textColorDark
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            TextField {
-                id: toField
-                width: 100
-                height: 46
-                font.pixelSize: 22
-                text: value.split("-")[1]
-
-                Component.onCompleted: {
-                    if (label === "TESTER RANGE") testerTo = this
-                    else if (label === "ECU RANGE") ecuTo = this
-                }
-            }
-        }
-    }
-
-    Component {
-        id: serviceEditor
-        ComboBox {
-            width: 420
-            height: 46
-            font.pixelSize: 22
-            model: choices
-
-            Component.onCompleted: {
-                currentIndex = Math.max(0, find(value))
-                serviceName = this
-            }
-        }
-    }
-
-    Component {
-        id: checkEditor
-        CheckBox {
-            height: 46
-            checked: checkedValue
-            text: checked ? "ON" : "OFF"
-            font.pixelSize: 22
-
-            indicator.width: 28
-            indicator.height: 28
-
-            Component.onCompleted: {
-                if (label === "STOP ON FIRST RESPONSE") stopFirst = this
-                else if (label === "DEBUG RX") debugRx = this
-            }
-        }
-    }
-
-    property var ifaceField
-    property var bitrateField
-    property var testerMode
-    property var testerSa
-    property var testerFrom
-    property var testerTo
-    property var ecuFrom
-    property var ecuTo
-    property var timeoutMs
-    property var serviceName
-    property var stopFirst
-    property var debugRx
 }

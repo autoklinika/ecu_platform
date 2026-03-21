@@ -758,3 +758,137 @@ void CANScannerEngine::onWorkerFinished(bool, const QString&)
 {
     setBusy(false);
 }
+void CANScannerEngine::setEcuInterface(const QString& v)
+{
+    if (m_ecuInterface == v)
+        return;
+    m_ecuInterface = v;
+    emit ecuSettingsChanged();
+}
+
+void CANScannerEngine::setEcuBitrate(int v)
+{
+    if (m_ecuBitrate == v)
+        return;
+    m_ecuBitrate = v;
+    emit ecuSettingsChanged();
+}
+
+void CANScannerEngine::setEcuTesterMode(const QString& v)
+{
+    if (m_ecuTesterMode == v)
+        return;
+    m_ecuTesterMode = v;
+    emit ecuSettingsChanged();
+}
+
+void CANScannerEngine::setEcuTesterSa(int v)
+{
+    if (m_ecuTesterSa == v)
+        return;
+    m_ecuTesterSa = v;
+    emit ecuSettingsChanged();
+}
+
+void CANScannerEngine::setEcuTesterFrom(int v)
+{
+    if (m_ecuTesterFrom == v)
+        return;
+    m_ecuTesterFrom = v;
+    emit ecuSettingsChanged();
+}
+
+void CANScannerEngine::setEcuTesterTo(int v)
+{
+    if (m_ecuTesterTo == v)
+        return;
+    m_ecuTesterTo = v;
+    emit ecuSettingsChanged();
+}
+
+void CANScannerEngine::setEcuAddrFrom(int v)
+{
+    if (m_ecuAddrFrom == v)
+        return;
+    m_ecuAddrFrom = v;
+    emit ecuSettingsChanged();
+}
+
+void CANScannerEngine::setEcuAddrTo(int v)
+{
+    if (m_ecuAddrTo == v)
+        return;
+    m_ecuAddrTo = v;
+    emit ecuSettingsChanged();
+}
+
+void CANScannerEngine::setEcuTimeoutMs(int v)
+{
+    if (m_ecuTimeoutMs == v)
+        return;
+    m_ecuTimeoutMs = v;
+    emit ecuSettingsChanged();
+}
+
+void CANScannerEngine::setEcuServiceName(const QString& v)
+{
+    if (m_ecuServiceName == v)
+        return;
+    m_ecuServiceName = v;
+    emit ecuSettingsChanged();
+}
+
+void CANScannerEngine::setEcuStopOnFirst(bool v)
+{
+    if (m_ecuStopOnFirst == v)
+        return;
+    m_ecuStopOnFirst = v;
+    emit ecuSettingsChanged();
+}
+
+void CANScannerEngine::setEcuDebugRx(bool v)
+{
+    if (m_ecuDebugRx == v)
+        return;
+    m_ecuDebugRx = v;
+    emit ecuSettingsChanged();
+}
+void CANScannerEngine::setBitrateInterface(const QString& v)
+{
+    if (m_bitrateInterface == v)
+        return;
+    m_bitrateInterface = v;
+    emit bitrateSettingsChanged();
+}
+
+void CANScannerEngine::setBitrateDetectMode(const QString& v)
+{
+    if (m_bitrateDetectMode == v)
+        return;
+    m_bitrateDetectMode = v;
+    emit bitrateSettingsChanged();
+}
+
+void CANScannerEngine::setBitrateTesterSa(int v)
+{
+    if (m_bitrateTesterSa == v)
+        return;
+    m_bitrateTesterSa = v;
+    emit bitrateSettingsChanged();
+}
+
+void CANScannerEngine::setBitrateListenMs(int v)
+{
+    if (m_bitrateListenMs == v)
+        return;
+    m_bitrateListenMs = v;
+    emit bitrateSettingsChanged();
+}
+
+void CANScannerEngine::setBitrateExtendedOnly(bool v)
+{
+    if (m_bitrateExtendedOnly == v)
+        return;
+    m_bitrateExtendedOnly = v;
+    emit bitrateSettingsChanged();
+}

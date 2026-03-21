@@ -77,6 +77,23 @@ class CANScannerEngine : public QObject
     Q_PROPERTY(int progressPercent READ progressPercent NOTIFY progressChanged)
     Q_PROPERTY(QVariantList results READ results NOTIFY resultsChanged)
     Q_PROPERTY(QString detectedBitrate READ detectedBitrate NOTIFY detectedBitrateChanged)
+    Q_PROPERTY(QString ecuInterface READ ecuInterface WRITE setEcuInterface NOTIFY ecuSettingsChanged)
+    Q_PROPERTY(int ecuBitrate READ ecuBitrate WRITE setEcuBitrate NOTIFY ecuSettingsChanged)
+    Q_PROPERTY(QString ecuTesterMode READ ecuTesterMode WRITE setEcuTesterMode NOTIFY ecuSettingsChanged)
+    Q_PROPERTY(int ecuTesterSa READ ecuTesterSa WRITE setEcuTesterSa NOTIFY ecuSettingsChanged)
+    Q_PROPERTY(int ecuTesterFrom READ ecuTesterFrom WRITE setEcuTesterFrom NOTIFY ecuSettingsChanged)
+    Q_PROPERTY(int ecuTesterTo READ ecuTesterTo WRITE setEcuTesterTo NOTIFY ecuSettingsChanged)
+    Q_PROPERTY(int ecuAddrFrom READ ecuAddrFrom WRITE setEcuAddrFrom NOTIFY ecuSettingsChanged)
+    Q_PROPERTY(int ecuAddrTo READ ecuAddrTo WRITE setEcuAddrTo NOTIFY ecuSettingsChanged)
+    Q_PROPERTY(int ecuTimeoutMs READ ecuTimeoutMs WRITE setEcuTimeoutMs NOTIFY ecuSettingsChanged)
+    Q_PROPERTY(QString ecuServiceName READ ecuServiceName WRITE setEcuServiceName NOTIFY ecuSettingsChanged)
+    Q_PROPERTY(bool ecuStopOnFirst READ ecuStopOnFirst WRITE setEcuStopOnFirst NOTIFY ecuSettingsChanged)
+    Q_PROPERTY(bool ecuDebugRx READ ecuDebugRx WRITE setEcuDebugRx NOTIFY ecuSettingsChanged)
+    Q_PROPERTY(QString bitrateInterface READ bitrateInterface WRITE setBitrateInterface NOTIFY bitrateSettingsChanged)
+    Q_PROPERTY(QString bitrateDetectMode READ bitrateDetectMode WRITE setBitrateDetectMode NOTIFY bitrateSettingsChanged)
+    Q_PROPERTY(int bitrateTesterSa READ bitrateTesterSa WRITE setBitrateTesterSa NOTIFY bitrateSettingsChanged)
+    Q_PROPERTY(int bitrateListenMs READ bitrateListenMs WRITE setBitrateListenMs NOTIFY bitrateSettingsChanged)
+    Q_PROPERTY(bool bitrateExtendedOnly READ bitrateExtendedOnly WRITE setBitrateExtendedOnly NOTIFY bitrateSettingsChanged)
 
 public:
     explicit CANScannerEngine(QObject* parent = nullptr);
@@ -115,6 +132,43 @@ public:
 
     Q_INVOKABLE void stopScan();
 
+    QString ecuInterface() const { return m_ecuInterface; }
+int ecuBitrate() const { return m_ecuBitrate; }
+QString ecuTesterMode() const { return m_ecuTesterMode; }
+int ecuTesterSa() const { return m_ecuTesterSa; }
+int ecuTesterFrom() const { return m_ecuTesterFrom; }
+int ecuTesterTo() const { return m_ecuTesterTo; }
+int ecuAddrFrom() const { return m_ecuAddrFrom; }
+int ecuAddrTo() const { return m_ecuAddrTo; }
+int ecuTimeoutMs() const { return m_ecuTimeoutMs; }
+QString ecuServiceName() const { return m_ecuServiceName; }
+bool ecuStopOnFirst() const { return m_ecuStopOnFirst; }
+bool ecuDebugRx() const { return m_ecuDebugRx; }
+
+void setEcuInterface(const QString& v);
+void setEcuBitrate(int v);
+void setEcuTesterMode(const QString& v);
+void setEcuTesterSa(int v);
+void setEcuTesterFrom(int v);
+void setEcuTesterTo(int v);
+void setEcuAddrFrom(int v);
+void setEcuAddrTo(int v);
+void setEcuTimeoutMs(int v);
+void setEcuServiceName(const QString& v);
+void setEcuStopOnFirst(bool v);
+void setEcuDebugRx(bool v);
+QString bitrateInterface() const { return m_bitrateInterface; }
+QString bitrateDetectMode() const { return m_bitrateDetectMode; }
+int bitrateTesterSa() const { return m_bitrateTesterSa; }
+int bitrateListenMs() const { return m_bitrateListenMs; }
+bool bitrateExtendedOnly() const { return m_bitrateExtendedOnly; }
+
+void setBitrateInterface(const QString& v);
+void setBitrateDetectMode(const QString& v);
+void setBitrateTesterSa(int v);
+void setBitrateListenMs(int v);
+void setBitrateExtendedOnly(bool v);
+
 signals:
     void busyChanged();
     void statusChanged();
@@ -122,6 +176,8 @@ signals:
     void progressChanged();
     void resultsChanged();
     void detectedBitrateChanged();
+    void ecuSettingsChanged();
+    void bitrateSettingsChanged();
 
     void startBitrateScanRequested(const QString& iface,
                                    const QString& detectMode,
@@ -143,6 +199,7 @@ signals:
                                bool debugRx);
 
     void stopRequested();
+    
 
 public slots:
     void onWorkerLog(const QString& line);
@@ -166,4 +223,21 @@ private:
 
     QThread m_workerThread;
     ScannerWorker* m_worker = nullptr;
+    QString m_ecuInterface = "can0";
+int m_ecuBitrate = 250000;
+QString m_ecuTesterMode = "manual";
+int m_ecuTesterSa = 241;
+int m_ecuTesterFrom = 240;
+int m_ecuTesterTo = 255;
+int m_ecuAddrFrom = 0;
+int m_ecuAddrTo = 254;
+int m_ecuTimeoutMs = 120;
+QString m_ecuServiceName = "TesterPresent (3E 00)";
+bool m_ecuStopOnFirst = true;
+bool m_ecuDebugRx = true;
+QString m_bitrateInterface = "can0";
+QString m_bitrateDetectMode = "auto";
+int m_bitrateTesterSa = 241;
+int m_bitrateListenMs = 800;
+bool m_bitrateExtendedOnly = true;
 };

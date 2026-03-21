@@ -8,25 +8,47 @@ Item {
 
     Theme { id: theme }
 
+    function toIntAuto(textValue) {
+        var s = String(textValue).trim()
+        if (s.length === 0)
+            return 0
+
+        if (s.indexOf("0x") === 0 || s.indexOf("0X") === 0)
+            return parseInt(s, 16)
+
+        if (/[A-Fa-f]/.test(s))
+            return parseInt(s, 16)
+
+        return parseInt(s, 10)
+    }
+
+    function formatHexByte(value) {
+        var n = Number(value)
+        if (isNaN(n))
+            n = 0
+        var s = n.toString(16).toUpperCase()
+        if (s.length < 2)
+            s = "0" + s
+        return "0x" + s
+    }
+
+    function saveParameters() {
+        CANScanner.bitrateInterface = ifaceField.text
+        CANScanner.bitrateDetectMode = detectMode.currentText
+        CANScanner.bitrateTesterSa = toIntAuto(testerSa.text)
+        CANScanner.bitrateListenMs = parseInt(listenMs.text, 10)
+        CANScanner.bitrateExtendedOnly = extOnly.checked
+        infoText.text = "Parameters saved"
+    }
+
     Rectangle {
         anchors.fill: parent
         color: theme.bgColor
     }
 
-    CANScannerTopBar {
-        id: topBar
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        titleText: "PARAMETERS"
-        leftButtonText: "BACK"
-        rightText: ""
-        onMenuClicked: Navigation.pop()
-    }
-
     Rectangle {
         id: panel
-        anchors.top: topBar.bottom
+        anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: bottomBar.top
@@ -39,11 +61,11 @@ Item {
 
         Column {
             anchors.fill: parent
-            anchors.margins: 18
+            anchors.margins: 16
             spacing: 12
 
             Text {
-                text: "BITRATE SCAN PARAMETERS"
+                text: "BITRATE PARAMETERS"
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: 28
                 font.bold: true
@@ -51,7 +73,7 @@ Item {
             }
 
             Text {
-                text: "Ustawienia przygotowane pod osobny ekran parametrów"
+                text: "Ustawienia wspólne dla skanowania bitrate"
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pixelSize: 18
                 color: theme.textColorMuted
@@ -68,19 +90,20 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.leftMargin: 16
-                    width: parent.width * 0.45
+                    width: parent.width * 0.42
                     text: "INTERFACE"
                     font.pixelSize: 22
                     color: theme.textColorDark
                 }
 
                 TextField {
+                    id: ifaceField
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
                     anchors.rightMargin: 16
-                    width: 260
+                    width: 240
                     height: 42
-                    text: "can0"
+                    text: CANScanner.bitrateInterface
                     font.pixelSize: 22
                 }
             }
@@ -96,20 +119,26 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.leftMargin: 16
-                    width: parent.width * 0.45
+                    width: parent.width * 0.42
                     text: "DETECTION MODE"
                     font.pixelSize: 22
                     color: theme.textColorDark
                 }
 
                 ComboBox {
+                    id: detectMode
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
                     anchors.rightMargin: 16
-                    width: 260
+                    width: 240
                     height: 42
                     model: ["auto", "listen_only", "probe_only"]
                     font.pixelSize: 22
+
+                    Component.onCompleted: {
+                        var idx = model.indexOf(CANScanner.bitrateDetectMode)
+                        currentIndex = idx >= 0 ? idx : 0
+                    }
                 }
             }
 
@@ -124,19 +153,20 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.leftMargin: 16
-                    width: parent.width * 0.45
-                    text: "TESTER SA (DEC)"
+                    width: parent.width * 0.42
+                    text: "TESTER SA [HEX]"
                     font.pixelSize: 22
                     color: theme.textColorDark
                 }
 
                 TextField {
+                    id: testerSa
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
                     anchors.rightMargin: 16
-                    width: 260
+                    width: 240
                     height: 42
-                    text: "241"
+                    text: formatHexByte(CANScanner.bitrateTesterSa)
                     font.pixelSize: 22
                 }
             }
@@ -152,19 +182,20 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.leftMargin: 16
-                    width: parent.width * 0.45
+                    width: parent.width * 0.42
                     text: "LISTEN TIME [ms]"
                     font.pixelSize: 22
                     color: theme.textColorDark
                 }
 
                 TextField {
+                    id: listenMs
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
                     anchors.rightMargin: 16
-                    width: 260
+                    width: 240
                     height: 42
-                    text: "800"
+                    text: String(CANScanner.bitrateListenMs)
                     font.pixelSize: 22
                 }
             }
@@ -180,20 +211,20 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.leftMargin: 16
-                    width: parent.width * 0.45
+                    width: parent.width * 0.42
                     text: "ONLY EXTENDED ID"
                     font.pixelSize: 22
                     color: theme.textColorDark
                 }
 
                 CheckBox {
+                    id: extOnly
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
                     anchors.rightMargin: 16
-                    checked: true
+                    checked: CANScanner.bitrateExtendedOnly
                     text: checked ? "ON" : "OFF"
                     font.pixelSize: 22
-
                     indicator.width: 28
                     indicator.height: 28
                 }
@@ -207,8 +238,9 @@ Item {
                 border.color: "#DDDDDD"
 
                 Text {
+                    id: infoText
                     anchors.centerIn: parent
-                    text: "Na tym etapie ekran parametrów jest tylko wizualny."
+                    text: "Zapisz zmiany przyciskiem SAVE"
                     font.pixelSize: 20
                     font.bold: true
                     color: theme.textColorDark
@@ -225,10 +257,17 @@ Item {
         spacing: 16
 
         StyledButton {
-            width: 180
+            width: 150
             height: 68
             text: "BACK"
             onClicked: Navigation.pop()
+        }
+
+        StyledButton {
+            width: 150
+            height: 68
+            text: "SAVE"
+            onClicked: root.saveParameters()
         }
     }
 }
