@@ -35,6 +35,26 @@ Item {
         return "0x" + s
     }
 
+    property string resultText: {
+        if (CANScanner.busy)
+            return "SCANNING..."
+        if (CANScanner.ecuFound)
+            return CANScanner.detectedEcu
+        if (CANScanner.status === "Brak odpowiedzi ECU")
+            return "NO ECU DETECTED"
+        return "---"
+    }
+
+    property color resultColor: {
+        if (CANScanner.busy)
+            return "#1D4ED8"
+        if (CANScanner.ecuFound)
+            return "#0A9F34"
+        if (CANScanner.status === "Brak odpowiedzi ECU")
+            return "#D22D2D"
+        return theme.textColorDark
+    }
+
     Rectangle {
         anchors.fill: parent
         color: theme.bgColor
@@ -75,6 +95,50 @@ Item {
 
             Rectangle {
                 width: parent.width
+                height: 128
+                radius: 14
+                color: "#FFFFFF"
+                border.color: theme.separatorColor
+                border.width: 1
+
+                Column {
+                    anchors.centerIn: parent
+                    spacing: 4
+
+                    Text {
+                        text: "SCAN RESULT"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: 18
+                        color: theme.textColorMuted
+                    }
+
+                    Text {
+                        text: root.resultText
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: 36
+                        font.bold: true
+                        color: root.resultColor
+                    }
+
+                    Text {
+                        text: {
+                            if (CANScanner.busy)
+                                return "ECU scan in progress"
+                            if (CANScanner.ecuFound)
+                                return "ECU detected successfully"
+                            if (CANScanner.status === "Brak odpowiedzi ECU")
+                                return "Scan completed without match"
+                            return "Ready to scan"
+                        }
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: 16
+                        color: theme.textColorMuted
+                    }
+                }
+            }
+
+            Rectangle {
+                width: parent.width
                 height: 110
                 radius: 14
                 color: "#FFFFFF"
@@ -104,7 +168,7 @@ Item {
                             height: parent.height
                             radius: parent.radius
                             width: parent.width * (CANScanner.progressPercent / 100.0)
-                            color: "#1D4ED8"
+                            color: CANScanner.ecuFound ? "#0A9F34" : "#1D4ED8"
                         }
                     }
 
@@ -120,92 +184,172 @@ Item {
                 width: parent.width
                 height: 64
                 radius: 12
-                color: CANScanner.busy ? "#EEF4FF" : "#F8F8F8"
-                border.color: CANScanner.busy ? "#C9D8FF" : "#DDDDDD"
+                color: CANScanner.ecuFound ? "#ECFDF3"
+                                           : (CANScanner.busy ? "#EEF4FF" : "#F8F8F8")
+                border.color: CANScanner.ecuFound ? "#B7E4C7"
+                                                  : (CANScanner.busy ? "#C9D8FF" : "#DDDDDD")
                 border.width: 1
 
                 Text {
                     anchors.centerIn: parent
-                    text: CANScanner.status === "" ? "Ready to scan" : CANScanner.status
+                    text: {
+                        if (CANScanner.ecuFound)
+                            return "Detected ECU: " + CANScanner.detectedEcu
+                        if (CANScanner.status === "Brak odpowiedzi ECU")
+                            return "Scan finished: no ECU detected"
+                        return CANScanner.status === "" ? "Ready to scan" : CANScanner.status
+                    }
                     font.pixelSize: 20
                     font.bold: true
-                    color: theme.textColorDark
+                    color: root.resultColor
                 }
             }
 
-            Rectangle {
+            Row {
                 width: parent.width
-                height: 124
-                radius: 14
-                color: "#FFFFFF"
-                border.color: theme.separatorColor
-                border.width: 1
+                spacing: 12
 
-                Column {
-                    anchors.fill: parent
-                    anchors.margins: 14
-                    spacing: 8
+                Rectangle {
+                    width: (parent.width - 12) / 2
+                    height: 138
+                    radius: 14
+                    color: "#FFFFFF"
+                    border.color: theme.separatorColor
+                    border.width: 1
 
-                    Text {
-                        text: "ACTIVE SERVICE"
-                        font.pixelSize: 18
-                        font.bold: true
-                        color: theme.textColorDark
-                    }
+                    Column {
+                        anchors.fill: parent
+                        anchors.margins: 14
+                        spacing: 8
 
-                    Text {
-                        text: CANScanner.ecuServiceName
-                        font.pixelSize: 18
-                        color: theme.textColorDark
-                        wrapMode: Text.WordWrap
-                    }
+                        Text {
+                            text: "ACTIVE SERVICE"
+                            font.pixelSize: 18
+                            font.bold: true
+                            color: theme.textColorDark
+                        }
 
-                    Text {
-                        text: "STOP FIRST: " + (CANScanner.ecuStopOnFirst ? "ON" : "OFF")
-                              + "    DEBUG RX: " + (CANScanner.ecuDebugRx ? "ON" : "OFF")
-                        font.pixelSize: 16
-                        color: theme.textColorMuted
+                        Text {
+                            text: CANScanner.ecuServiceName
+                            font.pixelSize: 18
+                            color: theme.textColorDark
+                            wrapMode: Text.WordWrap
+                            width: parent.width
+                        }
+
+                        Text {
+                            text: "STOP FIRST: " + (CANScanner.ecuStopOnFirst ? "ON" : "OFF")
+                            font.pixelSize: 16
+                            color: theme.textColorMuted
+                            wrapMode: Text.WordWrap
+                            width: parent.width
+                        }
+
+                        Text {
+                            text: "DEBUG RX: " + (CANScanner.ecuDebugRx ? "ON" : "OFF")
+                            font.pixelSize: 16
+                            color: theme.textColorMuted
+                            wrapMode: Text.WordWrap
+                            width: parent.width
+                        }
                     }
                 }
-            }
 
-            Rectangle {
-                width: parent.width
-                height: 128
-                radius: 14
-                color: "#FFFFFF"
-                border.color: theme.separatorColor
-                border.width: 1
+                Rectangle {
+                    width: (parent.width - 12) / 2
+                    height: 138
+                    radius: 14
+                    color: "#FFFFFF"
+                    border.color: theme.separatorColor
+                    border.width: 1
 
-                Column {
-                    anchors.fill: parent
-                    anchors.margins: 14
-                    spacing: 8
+                    Column {
+                        anchors.fill: parent
+                        anchors.margins: 14
+                        spacing: 8
 
-                    Text {
-                        text: "ACTIVE PARAMETERS"
-                        font.pixelSize: 18
-                        font.bold: true
-                        color: theme.textColorDark
-                    }
+                        Text {
+                            text: "ACTIVE PARAMETERS"
+                            font.pixelSize: 18
+                            font.bold: true
+                            color: theme.textColorDark
+                        }
 
-                    Text {
-                        text: "IF: " + CANScanner.ecuInterface
-                              + "    BR: " + CANScanner.ecuBitrate
-                              + "    MODE: " + CANScanner.ecuTesterMode
-                              + "    SA: " + root.hex2(CANScanner.ecuTesterSa)
-                        font.pixelSize: 16
-                        color: theme.textColorMuted
-                        wrapMode: Text.WordWrap
-                    }
+                        Row {
+                            width: parent.width
+                            spacing: 10
 
-                    Text {
-                        text: "T: " + root.hex2(CANScanner.ecuTesterFrom) + "-" + root.hex2(CANScanner.ecuTesterTo)
-                              + "    ECU: " + root.hex2(CANScanner.ecuAddrFrom) + "-" + root.hex2(CANScanner.ecuAddrTo)
-                              + "    TO: " + CANScanner.ecuTimeoutMs + " ms"
-                        font.pixelSize: 16
-                        color: theme.textColorMuted
-                        wrapMode: Text.WordWrap
+                            Column {
+                                width: (parent.width - 20) / 3
+                                spacing: 6
+
+                                Text {
+                                    text: "IF: " + CANScanner.ecuInterface
+                                    font.pixelSize: 15
+                                    color: theme.textColorMuted
+                                    wrapMode: Text.WordWrap
+                                    width: parent.width
+                                }
+
+                                Text {
+                                    text: "BR: " + CANScanner.ecuBitrate
+                                    font.pixelSize: 15
+                                    color: theme.textColorMuted
+                                    wrapMode: Text.WordWrap
+                                    width: parent.width
+                                }
+                            }
+
+                            Column {
+                                width: (parent.width - 20) / 3
+                                spacing: 6
+
+                                Text {
+                                    text: "MODE: " + CANScanner.ecuTesterMode
+                                    font.pixelSize: 15
+                                    color: theme.textColorMuted
+                                    wrapMode: Text.WordWrap
+                                    width: parent.width
+                                }
+
+                                Text {
+                                    text: "SA: " + root.hex2(CANScanner.ecuTesterSa)
+                                    font.pixelSize: 15
+                                    color: theme.textColorMuted
+                                    wrapMode: Text.WordWrap
+                                    width: parent.width
+                                }
+                            }
+
+                            Column {
+                                width: (parent.width - 20) / 3
+                                spacing: 6
+
+                                Text {
+                                    text: "T: " + root.hex2(CANScanner.ecuTesterFrom) + "-" + root.hex2(CANScanner.ecuTesterTo)
+                                    font.pixelSize: 15
+                                    color: theme.textColorMuted
+                                    wrapMode: Text.WordWrap
+                                    width: parent.width
+                                }
+
+                                Text {
+                                    text: "ECU: " + root.hex2(CANScanner.ecuAddrFrom) + "-" + root.hex2(CANScanner.ecuAddrTo)
+                                    font.pixelSize: 15
+                                    color: theme.textColorMuted
+                                    wrapMode: Text.WordWrap
+                                    width: parent.width
+                                }
+
+                                Text {
+                                    text: "TO: " + CANScanner.ecuTimeoutMs + " ms"
+                                    font.pixelSize: 15
+                                    color: theme.textColorMuted
+                                    wrapMode: Text.WordWrap
+                                    width: parent.width
+                                }
+                            }
+                        }
                     }
                 }
             }

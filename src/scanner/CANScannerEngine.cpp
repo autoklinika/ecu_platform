@@ -4,6 +4,8 @@
 #include <QElapsedTimer>
 #include <QProcess>
 #include <QThread>
+#include <QStringList>
+#include <QSet>
 
 #include <algorithm>
 #include <cstring>
@@ -113,12 +115,12 @@ bool ScannerWorker::receiveFrameTimeout(int fd, uint32_t& canId, uint8_t* data, 
     pfd.fd = fd;
     pfd.events = POLLIN;
 
-    int pr = ::poll(&pfd, 1, timeoutMs);
+    const int pr = ::poll(&pfd, 1, timeoutMs);
     if (pr <= 0)
         return false;
 
     struct can_frame frame {};
-    int n = ::read(fd, &frame, sizeof(frame));
+    const int n = ::read(fd, &frame, sizeof(frame));
     if (n <= 0)
         return false;
 
@@ -142,9 +144,8 @@ int ScannerWorker::drainSocket(int fd, int drainMs, QStringList* firstIds)
             continue;
 
         ++count;
-        if (firstIds && firstIds->size() < 5) {
+        if (firstIds && firstIds->size() < 5)
             firstIds->append(QString("0x%1").arg(id, 8, 16, QChar('0')).toUpper());
-        }
     }
 
     return count;
@@ -164,20 +165,17 @@ bool ScannerWorker::isExpectedDiagResponse(uint32_t canId, int ecuAddr, int test
 QString ScannerWorker::formatData(const uint8_t* data, int len) const
 {
     QStringList parts;
-    for (int i = 0; i < len; ++i) {
+    for (int i = 0; i < len; ++i)
         parts << QString("%1").arg(data[i], 2, 16, QChar('0')).toUpper();
-    }
     return parts.join(' ');
 }
 
 QString ScannerWorker::detectResponseType(const QByteArray& data) const
 {
-    if (data.size() >= 4 && static_cast<uint8_t>(data[1]) == 0x7F) {
+    if (data.size() >= 4 && static_cast<uint8_t>(data[1]) == 0x7F)
         return QString("NRC 0x%1").arg(static_cast<uint8_t>(data[3]), 2, 16, QChar('0')).toUpper();
-    }
-    if (data.size() >= 2) {
+    if (data.size() >= 2)
         return QString("SID 0x%1").arg(static_cast<uint8_t>(data[1]), 2, 16, QChar('0')).toUpper();
-    }
     return "Odpowiedź";
 }
 
@@ -191,6 +189,7 @@ QString ScannerWorker::servicePayloadNameToBytes(const QString& serviceName, QBy
         out = QByteArray::fromHex("0210010000000000");
         return "DiagnosticSessionControl (10 01)";
     }
+
     out = QByteArray::fromHex("0322F19000000000");
     return "ReadDataByIdentifier VIN (22 F1 90)";
 }
@@ -472,6 +471,9 @@ void ScannerWorker::runECUScan(const QString& iface,
     emit detectedBitrate(QString::number(bitrate) + " bit/s");
 
     bool anyFound = false;
+    bool firstFoundCaptured = false;
+    QString firstFoundEcu;
+    QString firstFoundTester;
     int step = 0;
 
     for (int ecu = ecuFrom; ecu <= ecuTo && !m_stop; ++ecu) {
@@ -535,19 +537,29 @@ void ScannerWorker::runECUScan(const QString& iface,
                 }
 
                 if (isExpectedDiagResponse(rid, ecu, tester)) {
-                    emit log(QString("RX MATCH ECU=0x%1: ID=0x%2 DATA=%3")
-                             .arg(ecu, 2, 16, QChar('0')).toUpper()
+                    const QString ecuHex = QString("0x%1").arg(ecu, 2, 16, QChar('0')).toUpper();
+                    const QString testerHex = QString("0x%1").arg(tester, 2, 16, QChar('0')).toUpper();
+
+                    emit log(QString("RX MATCH ECU=%1: ID=0x%2 DATA=%3")
+                             .arg(ecuHex)
                              .arg(rid, 8, 16, QChar('0')).toUpper()
                              .arg(formatData(data, len)));
 
+                    if (!firstFoundCaptured) {
+                        firstFoundCaptured = true;
+                        firstFoundEcu = ecuHex;
+                        firstFoundTester = testerHex;
+                        emit detectedEcu(firstFoundEcu);
+                    }
+
                     QVariantMap r;
-                    r["ecu"] = QString("0x%1").arg(ecu, 2, 16, QChar('0')).toUpper();
-                    r["tester"] = QString("0x%1").arg(tester, 2, 16, QChar('0')).toUpper();
+                    r["ecu"] = ecuHex;
+                    r["tester"] = testerHex;
                     r["reqId"] = QString("0x%1").arg(reqId, 8, 16, QChar('0')).toUpper();
                     r["respId"] = QString("0x%1").arg(rid, 8, 16, QChar('0')).toUpper();
                     r["data"] = formatData(data, len);
                     r["status"] = detectResponseType(QByteArray(reinterpret_cast<const char*>(data), len))
-                                  + QString(" | tester=0x%1").arg(tester, 2, 16, QChar('0')).toUpper();
+                                  + QString(" | tester=%1").arg(testerHex);
                     emit addResult(r);
 
                     matched = true;
@@ -582,6 +594,10 @@ void ScannerWorker::runECUScan(const QString& iface,
     summary += "========================================================================\n";
     summary += QString("Wynik końcowy          : %1\n").arg(anyFound ? "POZYTYWNY" : "NEGATYWNY");
     summary += QString("Bitrate                : %1 bit/s\n").arg(bitrate);
+    if (firstFoundCaptured) {
+        summary += QString("Wykryty adres ECU      : %1\n").arg(firstFoundEcu);
+        summary += QString("Tester SA              : %1\n").arg(firstFoundTester);
+    }
     summary += QString("Czas operacji          : %1 ms\n").arg(timer.elapsed());
     summary += "========================================================================\n";
 
@@ -609,6 +625,7 @@ CANScannerEngine::CANScannerEngine(QObject* parent)
     connect(m_worker, &ScannerWorker::status, this, &CANScannerEngine::onWorkerStatus);
     connect(m_worker, &ScannerWorker::progress, this, &CANScannerEngine::onWorkerProgress);
     connect(m_worker, &ScannerWorker::detectedBitrate, this, &CANScannerEngine::onWorkerDetectedBitrate);
+    connect(m_worker, &ScannerWorker::detectedEcu, this, &CANScannerEngine::onWorkerDetectedEcu);
     connect(m_worker, &ScannerWorker::addResult, this, &CANScannerEngine::onWorkerAddResult);
     connect(m_worker, &ScannerWorker::finished, this, &CANScannerEngine::onWorkerFinished);
 
@@ -696,6 +713,11 @@ void CANScannerEngine::scanECU(const QString& iface,
     clearLog();
     clearResults();
 
+    m_detectedEcu.clear();
+    m_ecuFound = false;
+    emit detectedEcuChanged();
+    emit ecuFoundChanged();
+
     m_progressCurrent = 0;
     m_progressTotal = 0;
     emit progressChanged();
@@ -748,6 +770,17 @@ void CANScannerEngine::onWorkerDetectedBitrate(const QString& bitrate)
     emit detectedBitrateChanged();
 }
 
+void CANScannerEngine::onWorkerDetectedEcu(const QString& ecuAddress)
+{
+    if (m_detectedEcu == ecuAddress && m_ecuFound)
+        return;
+
+    m_detectedEcu = ecuAddress;
+    m_ecuFound = true;
+    emit detectedEcuChanged();
+    emit ecuFoundChanged();
+}
+
 void CANScannerEngine::onWorkerAddResult(const QVariantMap& result)
 {
     m_results.append(result);
@@ -758,6 +791,7 @@ void CANScannerEngine::onWorkerFinished(bool, const QString&)
 {
     setBusy(false);
 }
+
 void CANScannerEngine::setEcuInterface(const QString& v)
 {
     if (m_ecuInterface == v)
@@ -853,6 +887,7 @@ void CANScannerEngine::setEcuDebugRx(bool v)
     m_ecuDebugRx = v;
     emit ecuSettingsChanged();
 }
+
 void CANScannerEngine::setBitrateInterface(const QString& v)
 {
     if (m_bitrateInterface == v)
